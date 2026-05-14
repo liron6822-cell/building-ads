@@ -1,14 +1,13 @@
 {
   "name": "building-ads",
   "version": "2.0.0",
-  "description": "Course campaign approval dashboard — Node.js + WebSocket real-time sync",
+  "description": "Course approval dashboard — Firebase Firestore real-time sync",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "serve -s public -l ${PORT:-3000} --no-clipboard"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "ws": "^8.18.0"
+    "serve": "^14.2.4"
   },
   "engines": {
     "node": ">=18"
