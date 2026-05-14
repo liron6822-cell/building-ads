@@ -92,6 +92,10 @@ tailwind.config = {
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinning { animation: spin 1s linear infinite; display: inline-block; }
   .college-chip.active { background: #4fb3ff; color: #00436a; border-color: #4fb3ff; font-weight: 600; }
+  @keyframes slide-up { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+  .toast-anim { animation: slide-up 0.25s ease-out forwards; }
+  @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); } 100% { box-shadow: 0 0 0 12px rgba(74, 222, 128, 0); } }
+  .pulse-ring { animation: pulse-ring 1s ease-out; }
 </style>
 </head>
 <body class="bg-surface text-text-primary min-h-screen flex flex-col" data-role="admin">
@@ -345,6 +349,9 @@ tailwind.config = {
   </div>
   <div id="log-list" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
 </div>
+
+<!-- ========== LIVE UPDATE TOAST ========== -->
+<div id="toast-container" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-[60] flex flex-col-reverse gap-2 pointer-events-none"></div>
 
 <!-- ========== IMAGE MODAL ========== -->
 <div id="img-modal" class="fixed inset-0 bg-black/90 z-50 hidden-state flex items-center justify-center p-8" onclick="this.classList.add('hidden-state')">
@@ -861,6 +868,7 @@ function saveState() {
   }, 300);
 }
 
+let isFirstSync = true;
 function setupRealtimeSync() {
   if (!firebaseReady) { updateSyncIndicator('local'); return; }
   updateSyncIndicator('connecting');
@@ -869,10 +877,19 @@ function setupRealtimeSync() {
       // First-time setup: push current local STATE to Firestore
       saveState();
       updateSyncIndicator('connected');
+      isFirstSync = false;
       return;
     }
-    const remote = snap.data();
     if (snap.metadata.hasPendingWrites) { updateSyncIndicator('connected'); return; }
+    const remote = snap.data();
+
+    // Detect remote update from another user (and what type of content)
+    const isRemoteUpdate = !isFirstSync && remote._updatedBy && CURRENT_USER && remote._updatedBy !== CURRENT_USER.email;
+    let changeDescription = null;
+    if (isRemoteUpdate) {
+      changeDescription = describeStateChange(STATE, remote);
+    }
+
     // Don't overwrite our own role
     const localRole = STATE.role;
     STATE = {
@@ -889,16 +906,97 @@ function setupRealtimeSync() {
     renderNotifList();
     renderLogList();
     updateLastSyncDisplay();
-    // Refresh drawer if open
     if (currentCourse && !document.getElementById('drawer-overlay').classList.contains('hidden-state')) {
       renderDrawerBody();
       renderDrawerFooter();
     }
     updateSyncIndicator('connected');
+
+    // Show toast for remote updates
+    if (isRemoteUpdate && changeDescription) {
+      const userName = USERS[remote._updatedBy]?.name || remote._updatedBy;
+      showLiveToast(userName, changeDescription);
+      pulseIndicator();
+    }
+    isFirstSync = false;
   }, err => {
     console.warn('[sync] listener error:', err);
     updateSyncIndicator('error');
   });
+}
+
+// Compare two state snapshots and return a human-readable summary of what changed
+function describeStateChange(oldS, newS) {
+  // Count approvals diff
+  let approvalChanges = [];
+  const newApprovals = newS.approvals || {};
+  const oldApprovals = oldS.approvals || {};
+  for (const cid of Object.keys(newApprovals)) {
+    const newC = newApprovals[cid] || {};
+    const oldC = oldApprovals[cid] || {};
+    for (const k of Object.keys(newC)) {
+      if (newC[k] !== oldC[k]) {
+        const type = k.split('::')[0];
+        approvalChanges.push({ courseId: cid, type, status: newC[k] });
+      }
+    }
+  }
+  // Count comment diff
+  const oldComments = oldS.comments || {};
+  const newComments = newS.comments || {};
+  let commentChanges = 0;
+  for (const k of Object.keys(newComments)) {
+    const oldLen = (oldComments[k] || []).length;
+    const newLen = (newComments[k] || []).length;
+    if (newLen > oldLen) commentChanges += (newLen - oldLen);
+  }
+  // Notifications diff (Drive refresh, campaign live, etc)
+  const oldNotifs = oldS.notifications || [];
+  const newNotifs = newS.notifications || [];
+  const newOnly = newNotifs.length - oldNotifs.length;
+
+  if (approvalChanges.length) {
+    const labels = { banner: 'באנר', ad_text: 'טקסט מודעה', screening: 'שאלת סינון' };
+    const a = approvalChanges[0];
+    const courseName = findCourse(a.courseId)?.name || a.courseId;
+    const action = a.status === 'approved' ? 'אישר/ה' : a.status === 'rejected' ? 'דחה/תה' : 'בטל/ה אישור';
+    const more = approvalChanges.length > 1 ? ` +${approvalChanges.length-1} נוספים` : '';
+    return `${action} ${labels[a.type] || a.type} · ${courseName}${more}`;
+  }
+  if (commentChanges) return `הוסיף/ה ${commentChanges} הערה${commentChanges>1?'ות':''}`;
+  if (newOnly > 0) return `פעולה במערכת (${newOnly} התראות חדשות)`;
+  return null;
+}
+
+function showLiveToast(userName, description) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast-anim pointer-events-auto bg-surface-container border border-status-success/40 rounded-lg shadow-2xl p-3 pr-4 flex items-center gap-3 min-w-[280px] max-w-[420px]';
+  toast.innerHTML = `
+    <div class="w-8 h-8 rounded-full bg-status-success/20 flex items-center justify-center flex-shrink-0">
+      <span class="material-symbols-outlined text-status-success text-[18px]">sync</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="text-body-sm text-text-primary font-semibold truncate">${escapeHtml(userName)}</div>
+      <div class="text-meta text-text-muted truncate">${escapeHtml(description)}</div>
+    </div>
+    <button onclick="this.parentElement.remove()" class="text-text-muted hover:text-text-primary flex-shrink-0">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+    </button>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'opacity .25s';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 250);
+  }, 4500);
+}
+
+function pulseIndicator() {
+  const el = document.getElementById('sync-indicator');
+  if (!el) return;
+  el.classList.add('pulse-ring');
+  setTimeout(() => el.classList.remove('pulse-ring'), 1000);
 }
 
 function updateSyncIndicator(status) {
