@@ -7,6 +7,9 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<!-- Firebase Firestore (for real-time multi-user sync) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
 tailwind.config = {
   darkMode: "class",
@@ -137,7 +140,10 @@ tailwind.config = {
     <div class="flex items-center gap-3">
       <span class="material-symbols-outlined text-primary-container">verified_user</span>
       <h1 class="text-headline-md text-text-primary">דאשבורד אישור תכנים</h1>
-      <span id="last-sync" class="text-meta-xs text-text-muted hidden md:inline">סנכרון אחרון: —</span>
+      <div class="hidden md:flex flex-col gap-0.5 text-meta-xs">
+        <span id="sync-indicator" class="text-meta-xs flex items-center gap-1 text-text-muted"><span class="material-symbols-outlined text-[14px]">help</span>מאתחל…</span>
+        <span id="last-sync" class="text-meta-xs text-text-muted">סנכרון Drive: —</span>
+      </div>
     </div>
     <div class="flex items-center gap-2">
       <div class="relative hidden md:block">
@@ -779,6 +785,35 @@ Object.values(CAMPAIGNS).forEach(c => {
 });
 
 // ============================================================
+// FIREBASE — real-time multi-user sync
+// ============================================================
+// To activate: create a Firebase project, enable Firestore,
+// and paste your config below. Until then, falls back to localStorage.
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+let db = null;
+let firebaseReady = false;
+let firebaseUnsub = null;
+if (firebaseConfig.apiKey && typeof firebase !== 'undefined') {
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    firebaseReady = true;
+    console.log('[sync] Firebase initialized — real-time sync enabled');
+  } catch (e) {
+    console.warn('[sync] Firebase init failed:', e);
+  }
+} else {
+  console.log('[sync] Firebase config missing — running in local-only mode (localStorage)');
+}
+
+// ============================================================
 // USERS (demo accounts — in production use a backend)
 // ============================================================
 const USERS = {
@@ -809,7 +844,76 @@ function loadState() {
   try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY)); if (s && s.approvals) return s; } catch(e) {}
   return { role: 'admin', approvals: {}, comments: {}, notifications: [], log: [], last_sync: null };
 }
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); }
+
+let saveTimer = null;
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  if (!firebaseReady) return;
+  // Debounce Firestore writes
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const { role, ...sharedState } = STATE; // strip per-user field
+    sharedState._updatedBy = CURRENT_USER ? CURRENT_USER.email : 'anonymous';
+    sharedState._updatedAt = Date.now();
+    db.collection('appState').doc('main').set(sharedState)
+      .then(() => updateSyncIndicator('connected'))
+      .catch(e => { console.warn('[sync] save failed:', e); updateSyncIndicator('error'); });
+  }, 300);
+}
+
+function setupRealtimeSync() {
+  if (!firebaseReady) { updateSyncIndicator('local'); return; }
+  updateSyncIndicator('connecting');
+  firebaseUnsub = db.collection('appState').doc('main').onSnapshot(snap => {
+    if (!snap.exists) {
+      // First-time setup: push current local STATE to Firestore
+      saveState();
+      updateSyncIndicator('connected');
+      return;
+    }
+    const remote = snap.data();
+    if (snap.metadata.hasPendingWrites) { updateSyncIndicator('connected'); return; }
+    // Don't overwrite our own role
+    const localRole = STATE.role;
+    STATE = {
+      approvals: remote.approvals || {},
+      comments: remote.comments || {},
+      notifications: remote.notifications || [],
+      log: remote.log || [],
+      last_sync: remote.last_sync || null,
+      role: localRole
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+    render();
+    renderNotifBadge();
+    renderNotifList();
+    renderLogList();
+    updateLastSyncDisplay();
+    // Refresh drawer if open
+    if (currentCourse && !document.getElementById('drawer-overlay').classList.contains('hidden-state')) {
+      renderDrawerBody();
+      renderDrawerFooter();
+    }
+    updateSyncIndicator('connected');
+  }, err => {
+    console.warn('[sync] listener error:', err);
+    updateSyncIndicator('error');
+  });
+}
+
+function updateSyncIndicator(status) {
+  const el = document.getElementById('sync-indicator');
+  if (!el) return;
+  const cfg = {
+    connecting: { txt: 'מתחבר…', cls: 'text-status-warning', icon: 'sync' },
+    connected:  { txt: 'מסונכרן', cls: 'text-status-success', icon: 'cloud_done' },
+    error:      { txt: 'שגיאת סנכרון', cls: 'text-status-danger', icon: 'cloud_off' },
+    local:      { txt: 'מקומי בלבד', cls: 'text-text-muted', icon: 'storage' }
+  }[status] || { txt: '—', cls: 'text-text-muted', icon: 'help' };
+  el.className = `text-meta-xs flex items-center gap-1 ${cfg.cls}`;
+  el.innerHTML = `<span class="material-symbols-outlined text-[14px]">${cfg.icon}</span>${cfg.txt}`;
+}
+
 function nowFull() { return new Date().toLocaleString('he-IL'); }
 
 function loadSession() {
@@ -1709,6 +1813,9 @@ function init() {
 
   document.getElementById('btn-notif').addEventListener('click', () => togglePanel('notif'));
   document.getElementById('btn-log').addEventListener('click', () => togglePanel('log'));
+
+  // Real-time multi-user sync (Firebase Firestore)
+  setupRealtimeSync();
 }
 init();
 </script>
