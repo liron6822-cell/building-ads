@@ -7,9 +7,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-<!-- Firebase Firestore (for real-time multi-user sync) -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
 tailwind.config = {
   darkMode: "class",
@@ -792,32 +789,76 @@ Object.values(CAMPAIGNS).forEach(c => {
 });
 
 // ============================================================
-// FIREBASE — real-time multi-user sync
+// REAL-TIME SYNC — WebSocket to our own Node.js server
 // ============================================================
-// To activate: create a Firebase project, enable Firestore,
-// and paste your config below. Until then, falls back to localStorage.
-const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
-};
-let db = null;
-let firebaseReady = false;
-let firebaseUnsub = null;
-if (firebaseConfig.apiKey && typeof firebase !== 'undefined') {
+let ws = null;
+let wsReady = false;
+let isFirstSync = true;
+let wsReconnectTimer = null;
+
+function connectWebSocket() {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const url = `${proto}//${location.host}`;
   try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    firebaseReady = true;
-    console.log('[sync] Firebase initialized — real-time sync enabled');
+    ws = new WebSocket(url);
   } catch (e) {
-    console.warn('[sync] Firebase init failed:', e);
+    console.warn('[sync] WebSocket create failed:', e);
+    updateSyncIndicator('error');
+    scheduleReconnect();
+    return;
   }
-} else {
-  console.log('[sync] Firebase config missing — running in local-only mode (localStorage)');
+  updateSyncIndicator('connecting');
+  ws.addEventListener('open', () => {
+    wsReady = true;
+    updateSyncIndicator('connected');
+    // Send auth if we have a token
+    const token = localStorage.getItem('auth_token');
+    if (token) ws.send(JSON.stringify({ type: 'auth', token }));
+  });
+  ws.addEventListener('message', (e) => {
+    let msg; try { msg = JSON.parse(e.data); } catch (err) { return; }
+    if (msg.type === 'state' || msg.type === 'state_ack') applyRemoteState(msg.state, msg.type === 'state');
+    else if (msg.type === 'auth_fail') { console.warn('[sync] auth failed'); }
+    else if (msg.type === 'error' && msg.error === 'permission_denied') {
+      alert('פעולה זו דורשת הרשאות מנהל מערכת');
+    }
+  });
+  ws.addEventListener('close', () => {
+    wsReady = false;
+    updateSyncIndicator('error');
+    scheduleReconnect();
+  });
+  ws.addEventListener('error', () => { updateSyncIndicator('error'); });
+}
+function scheduleReconnect() {
+  clearTimeout(wsReconnectTimer);
+  wsReconnectTimer = setTimeout(connectWebSocket, 3000);
+}
+function applyRemoteState(remote, isBroadcast) {
+  if (!remote) return;
+  const isRemoteUpdate = !isFirstSync && isBroadcast && remote._updatedBy && CURRENT_USER && remote._updatedBy !== CURRENT_USER.email;
+  let changeDescription = null;
+  if (isRemoteUpdate) changeDescription = describeStateChange(STATE, remote);
+  const localRole = STATE.role;
+  STATE = {
+    approvals: remote.approvals || {},
+    comments: remote.comments || {},
+    notifications: remote.notifications || [],
+    log: remote.log || [],
+    last_sync: remote.last_sync || null,
+    role: localRole
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  render(); renderNotifBadge(); renderNotifList(); renderLogList(); updateLastSyncDisplay();
+  if (currentCourse && !document.getElementById('drawer-overlay').classList.contains('hidden-state')) {
+    renderDrawerBody(); renderDrawerFooter();
+  }
+  if (isRemoteUpdate && changeDescription) {
+    const userName = USERS[remote._updatedBy]?.name || remote._updatedBy;
+    showLiveToast(userName, changeDescription);
+    pulseIndicator();
+  }
+  isFirstSync = false;
 }
 
 // ============================================================
@@ -853,76 +894,22 @@ function loadState() {
 }
 
 let saveTimer = null;
-function saveState() {
+let pendingAction = null;
+function saveState(action) {
+  if (action) pendingAction = action;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
-  if (!firebaseReady) return;
-  // Debounce Firestore writes
+  if (!wsReady || !ws) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    const { role, ...sharedState } = STATE; // strip per-user field
-    sharedState._updatedBy = CURRENT_USER ? CURRENT_USER.email : 'anonymous';
-    sharedState._updatedAt = Date.now();
-    db.collection('appState').doc('main').set(sharedState)
-      .then(() => updateSyncIndicator('connected'))
-      .catch(e => { console.warn('[sync] save failed:', e); updateSyncIndicator('error'); });
-  }, 300);
+    const { role, ...sharedState } = STATE;
+    try { ws.send(JSON.stringify({ type: 'update', state: sharedState, action: pendingAction })); }
+    catch (e) { console.warn('[sync] ws send failed:', e); }
+    pendingAction = null;
+  }, 200);
 }
 
-let isFirstSync = true;
 function setupRealtimeSync() {
-  if (!firebaseReady) { updateSyncIndicator('local'); return; }
-  updateSyncIndicator('connecting');
-  firebaseUnsub = db.collection('appState').doc('main').onSnapshot(snap => {
-    if (!snap.exists) {
-      // First-time setup: push current local STATE to Firestore
-      saveState();
-      updateSyncIndicator('connected');
-      isFirstSync = false;
-      return;
-    }
-    if (snap.metadata.hasPendingWrites) { updateSyncIndicator('connected'); return; }
-    const remote = snap.data();
-
-    // Detect remote update from another user (and what type of content)
-    const isRemoteUpdate = !isFirstSync && remote._updatedBy && CURRENT_USER && remote._updatedBy !== CURRENT_USER.email;
-    let changeDescription = null;
-    if (isRemoteUpdate) {
-      changeDescription = describeStateChange(STATE, remote);
-    }
-
-    // Don't overwrite our own role
-    const localRole = STATE.role;
-    STATE = {
-      approvals: remote.approvals || {},
-      comments: remote.comments || {},
-      notifications: remote.notifications || [],
-      log: remote.log || [],
-      last_sync: remote.last_sync || null,
-      role: localRole
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
-    render();
-    renderNotifBadge();
-    renderNotifList();
-    renderLogList();
-    updateLastSyncDisplay();
-    if (currentCourse && !document.getElementById('drawer-overlay').classList.contains('hidden-state')) {
-      renderDrawerBody();
-      renderDrawerFooter();
-    }
-    updateSyncIndicator('connected');
-
-    // Show toast for remote updates
-    if (isRemoteUpdate && changeDescription) {
-      const userName = USERS[remote._updatedBy]?.name || remote._updatedBy;
-      showLiveToast(userName, changeDescription);
-      pulseIndicator();
-    }
-    isFirstSync = false;
-  }, err => {
-    console.warn('[sync] listener error:', err);
-    updateSyncIndicator('error');
-  });
+  connectWebSocket();
 }
 
 // Compare two state snapshots and return a human-readable summary of what changed
@@ -1046,7 +1033,7 @@ function setApproval(courseId, key, status) {
   if (!STATE.approvals[courseId]) STATE.approvals[courseId] = {};
   STATE.approvals[courseId][key] = status;
   logAction(status === 'approved' ? 'approve' : 'reject', courseId, key);
-  saveState();
+  saveState(status === 'approved' ? 'approve' : 'reject');
 }
 function getComments(courseId, key) { return STATE.comments[`${courseId}::${key}`] || []; }
 function addComment(courseId, key, text) {
@@ -1055,7 +1042,7 @@ function addComment(courseId, key, text) {
   STATE.comments[k].push({ user: STATE.role, text, ts: nowFull() });
   logAction('comment', courseId, key, text);
   pushNotification('comment', `הערה חדשה: ${text.substring(0, 50)}${text.length>50?'…':''}`, courseId);
-  saveState();
+  saveState('comment');
 }
 function logAction(action, courseId, itemKey, extra) {
   STATE.log.unshift({ action, courseId, itemKey, extra: extra || '', user: STATE.role, ts: nowFull() });
@@ -1735,27 +1722,51 @@ function showLoginError(msg) {
   document.getElementById('login-error-text').textContent = msg;
   box.classList.remove('hidden-state');
 }
-function doLogin(email, password) {
-  const u = USERS[email];
-  if (!u) { showLoginError('אימייל לא קיים במערכת'); return false; }
-  if (u.password !== password) { showLoginError('סיסמה שגויה'); return false; }
-  saveSession(email);
-  CURRENT_USER = { email, ...u };
-  STATE.role = u.role;
-  saveState();
-  document.getElementById('login-screen').classList.add('hidden-state');
-  logAction('login', '', 'session');
-  pushNotification('upload', `${u.name} התחבר/ה למערכת`, '');
-  saveState();
-  applyUser();
-  render();
-  renderNotifList();
-  renderLogList();
-  return true;
+async function doLogin(email, password) {
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      showLoginError(err.error || 'התחברות נכשלה');
+      return false;
+    }
+    const data = await res.json();
+    localStorage.setItem('auth_token', data.token);
+    saveSession(data.user.email);
+    CURRENT_USER = data.user;
+    STATE.role = data.user.role;
+    document.getElementById('login-screen').classList.add('hidden-state');
+    logAction('login', '', 'session');
+    pushNotification('upload', `${data.user.name} התחבר/ה למערכת`, '');
+    saveState('login');
+    applyUser();
+    render();
+    renderNotifList();
+    renderLogList();
+    // Re-auth WebSocket with new token
+    if (wsReady && ws) ws.send(JSON.stringify({ type: 'auth', token: data.token }));
+    return true;
+  } catch (e) {
+    showLoginError('שגיאת רשת — נסה שוב');
+    return false;
+  }
 }
-function logout() {
+async function logout() {
+  const token = localStorage.getItem('auth_token');
   if (CURRENT_USER) logAction('logout', '', 'session');
-  saveState();
+  saveState('logout');
+  try {
+    await fetch('/api/logout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+  } catch (e) { /* ignore */ }
+  localStorage.removeItem('auth_token');
   clearSession();
   CURRENT_USER = null;
   document.getElementById('user-menu').classList.add('hidden-state');
@@ -1864,7 +1875,7 @@ function applyFilters() {
 // ============================================================
 // INIT
 // ============================================================
-function init() {
+async function init() {
   // Bind login form first (always available)
   document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -1873,13 +1884,32 @@ function init() {
     doLogin(email, pw);
   });
 
-  // Check for existing session
-  const session = loadSession();
-  if (session && USERS[session.email]) {
-    CURRENT_USER = { email: session.email, ...USERS[session.email] };
-    STATE.role = CURRENT_USER.role;
-    saveState();
-    applyUser();
+  // Check for existing session via server
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    try {
+      const res = await fetch('/api/me', { headers: { 'Authorization': 'Bearer ' + token } });
+      if (res.ok) {
+        const data = await res.json();
+        CURRENT_USER = data.user;
+        STATE.role = data.user.role;
+        applyUser();
+      } else {
+        localStorage.removeItem('auth_token');
+        clearSession();
+        document.getElementById('login-screen').classList.remove('hidden-state');
+      }
+    } catch (e) {
+      // Offline: trust local session as fallback
+      const session = loadSession();
+      if (session && USERS[session.email]) {
+        CURRENT_USER = { email: session.email, ...USERS[session.email] };
+        STATE.role = CURRENT_USER.role;
+        applyUser();
+      } else {
+        document.getElementById('login-screen').classList.remove('hidden-state');
+      }
+    }
   } else {
     document.getElementById('login-screen').classList.remove('hidden-state');
   }

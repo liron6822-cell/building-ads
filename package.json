@@ -1,13 +1,14 @@
 {
   "name": "building-ads",
-  "version": "1.0.0",
-  "description": "Course campaign approval dashboard — Drive sync + Meta upload gating",
+  "version": "2.0.0",
+  "description": "Course campaign approval dashboard — Node.js + WebSocket real-time sync",
   "private": true,
   "scripts": {
-    "start": "serve -s . -l ${PORT:-3000} --no-clipboard"
+    "start": "node server.js"
   },
   "dependencies": {
-    "serve": "^14.2.4"
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
   },
   "engines": {
     "node": ">=18"
