@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html class="dark" dir="rtl" lang="he">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>דאשבורד אישור תכנים — 3 מכללות</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#0f1419",
+        "surface-dim": "#0f1419",
+        "surface-bright": "#353a3f",
+        "surface-container-lowest": "#0a0f14",
+        "surface-container-low": "#171c21",
+        "surface-container": "#1b2025",
+        "surface-container-high": "#252a30",
+        "surface-container-highest": "#30353b",
+        "surface-variant": "#30353b",
+        "on-surface": "#dee3ea",
+        "on-surface-variant": "#bfc7d2",
+        "outline": "#89929c",
+        "outline-variant": "#3f4851",
+        "primary": "#97ccff",
+        "primary-container": "#4fb3ff",
+        "on-primary": "#003352",
+        "on-primary-container": "#00436a",
+        "text-primary": "#e8ecf1",
+        "text-muted": "#8a96a8",
+        "status-success": "#4ade80",
+        "status-warning": "#fbbf24",
+        "status-danger": "#f87171",
+        "status-highlight": "#c084fc",
+        "background": "#0f1419"
+      },
+      fontFamily: {
+        "sans": ["Heebo", "Assistant", "system-ui", "sans-serif"]
+      },
+      fontSize: {
+        "headline-lg": ["22px", { lineHeight: "32px", fontWeight: "700" }],
+        "headline-md": ["18px", { lineHeight: "26px", fontWeight: "600" }],
+        "headline-sm": ["16px", { lineHeight: "24px", fontWeight: "600" }],
+        "body-md": ["14px", { lineHeight: "21px", fontWeight: "400" }],
+        "body-sm": ["13px", { lineHeight: "19px", fontWeight: "400" }],
+        "meta": ["12px", { lineHeight: "16px", fontWeight: "500" }],
+        "meta-xs": ["11px", { lineHeight: "14px", fontWeight: "500" }]
+      },
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        lg: "0.5rem",
+        xl: "0.75rem"
+      },
+      spacing: {
+        "gutter": "16px",
+        "margin-page": "24px",
+        "card-padding": "16px",
+        "drawer-desktop": "900px"
+      }
+    }
+  }
+};
+</script>
+<style>
+  body { font-family: 'Heebo', 'Assistant', system-ui, sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .ai-text-body { white-space: pre-wrap; line-height: 1.6; }
+  .ai-text-body.collapsed { max-height: 240px; overflow: hidden; position: relative; }
+  .ai-text-body.collapsed::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+    background: linear-gradient(to top, #1b2025, transparent); pointer-events: none;
+  }
+  .hidden-state { display: none !important; }
+  body[data-role="content"] .role-admin-only,
+  body[data-role="campaigns"] .role-admin-only { opacity: 0.45; pointer-events: none; cursor: not-allowed; }
+  body[data-role="content"] .role-admin-only::after,
+  body[data-role="campaigns"] .role-admin-only::after { content: " 🔒"; }
+  .drawer-overlay { transition: opacity 0.2s; }
+  .drawer-panel { transition: transform 0.25s; }
+  .side-panel { transition: transform 0.25s; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0f1419; }
+  ::-webkit-scrollbar-thumb { background: #3f4851; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #89929c; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinning { animation: spin 1s linear infinite; display: inline-block; }
+  .college-chip.active { background: #4fb3ff; color: #00436a; border-color: #4fb3ff; font-weight: 600; }
+</style>
+</head>
+<body class="bg-surface text-text-primary min-h-screen flex flex-col" data-role="admin">
+
+<!-- ========== LOGIN SCREEN ========== -->
+<div id="login-screen" class="hidden-state fixed inset-0 bg-surface z-[100] flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-surface-container border border-outline-variant rounded-xl p-8 shadow-2xl">
+    <div class="text-center mb-6">
+      <div class="inline-flex w-16 h-16 rounded-full bg-primary-container/20 items-center justify-center mb-3">
+        <span class="material-symbols-outlined text-primary-container text-[32px]">verified_user</span>
+      </div>
+      <h2 class="text-headline-md text-text-primary mb-1">כניסה לדאשבורד</h2>
+      <p class="text-body-sm text-text-muted">דאשבורד אישור תכנים — 3 מכללות</p>
+    </div>
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label class="text-meta text-text-muted block mb-1">אימייל</label>
+        <input id="login-email" type="email" required placeholder="name@example.com" class="w-full bg-surface border border-outline-variant rounded p-2.5 text-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container" />
+      </div>
+      <div>
+        <label class="text-meta text-text-muted block mb-1">סיסמה</label>
+        <input id="login-password" type="password" required placeholder="••••••••" class="w-full bg-surface border border-outline-variant rounded p-2.5 text-body-md text-text-primary focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container" />
+      </div>
+      <div id="login-error" class="hidden-state bg-status-danger/10 border border-status-danger/30 text-status-danger text-meta rounded p-2 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">error</span>
+        <span id="login-error-text"></span>
+      </div>
+      <button type="submit" class="w-full bg-primary-container text-on-primary-container py-2.5 rounded font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">login</span>התחבר
+      </button>
+    </form>
+    <div class="mt-6 pt-4 border-t border-outline-variant">
+      <p class="text-meta text-text-muted text-center mb-3">כניסה מהירה לדמו:</p>
+      <div class="grid grid-cols-1 gap-2">
+        <button onclick="quickLogin('admin@bc.co.il','demo123')" class="text-meta-xs text-text-muted bg-surface border border-outline-variant rounded py-1.5 px-3 hover:border-primary-container transition-colors text-right">✅ מנהל מערכת · admin@bc.co.il / demo123</button>
+        <button onclick="quickLogin('content@bc.co.il','demo123')" class="text-meta-xs text-text-muted bg-surface border border-outline-variant rounded py-1.5 px-3 hover:border-primary-container transition-colors text-right">👤 מנהל תוכן · content@bc.co.il / demo123</button>
+        <button onclick="quickLogin('campaigns@bc.co.il','demo123')" class="text-meta-xs text-text-muted bg-surface border border-outline-variant rounded py-1.5 px-3 hover:border-primary-container transition-colors text-right">📊 מנהל קמפיינים · campaigns@bc.co.il / demo123</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== HEADER ========== -->
+<header class="bg-surface-container-low border-b border-outline-variant sticky top-0 z-30">
+  <div class="flex items-center justify-between gap-4 px-margin-page py-3">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary-container">verified_user</span>
+      <h1 class="text-headline-md text-text-primary">דאשבורד אישור תכנים</h1>
+      <span id="last-sync" class="text-meta-xs text-text-muted hidden md:inline">סנכרון אחרון: —</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="relative hidden md:block">
+        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">search</span>
+        <input id="search" type="search" placeholder="חיפוש קורס…" class="bg-surface-container border border-outline-variant text-text-primary text-body-sm rounded py-1.5 pr-10 pl-4 focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container w-56 transition-colors" />
+      </div>
+      <button id="btn-refresh" onclick="refreshDrive()" class="flex items-center gap-1 px-3 h-10 rounded-full bg-primary-container/15 border border-primary-container/40 text-primary hover:bg-primary-container/25 transition-colors" title="סנכרן את הדרייב">
+        <span id="refresh-icon" class="material-symbols-outlined text-[18px]">cloud_sync</span>
+        <span class="text-body-sm hidden md:inline">סנכרן Drive</span>
+      </button>
+      <button id="btn-notif" class="relative w-10 h-10 rounded-full flex items-center justify-center text-text-primary hover:bg-surface-container-high transition-colors">
+        <span class="material-symbols-outlined">notifications</span>
+        <span id="notif-count" class="absolute top-1 right-1 bg-status-danger text-white text-[10px] font-bold rounded-full min-w-[16px] h-[16px] px-1 flex items-center justify-center hidden-state">0</span>
+      </button>
+      <button id="btn-log" class="w-10 h-10 rounded-full flex items-center justify-center text-text-primary hover:bg-surface-container-high transition-colors" title="לוג פעולות">
+        <span class="material-symbols-outlined">history</span>
+      </button>
+      <div class="relative">
+        <button id="btn-user" onclick="toggleUserMenu()" class="flex items-center gap-2 h-10 px-2 rounded-full hover:bg-surface-container-high transition-colors">
+          <div class="w-8 h-8 rounded-full bg-primary-container/30 border border-primary-container/40 flex items-center justify-center text-primary font-semibold text-body-sm" id="user-avatar">?</div>
+          <div class="hidden md:flex flex-col items-end leading-tight">
+            <span id="user-name" class="text-meta text-text-primary font-semibold">—</span>
+            <span id="user-role" class="text-meta-xs text-text-muted">—</span>
+          </div>
+        </button>
+        <div id="user-menu" class="hidden-state absolute top-12 left-0 bg-surface-container border border-outline-variant rounded-lg shadow-xl min-w-[200px] py-1 z-50">
+          <div class="px-3 py-2 border-b border-outline-variant">
+            <div id="user-email" class="text-meta text-text-primary font-mono"></div>
+            <div id="user-perms" class="text-meta-xs text-text-muted mt-1"></div>
+          </div>
+          <button onclick="logout()" class="w-full text-right px-3 py-2 hover:bg-surface-variant flex items-center gap-2 text-body-sm text-status-danger">
+            <span class="material-symbols-outlined text-[18px]">logout</span>התנתק
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========== LAYOUT ========== -->
+<div class="flex flex-1 overflow-hidden">
+
+  <!-- ========== SIDEBAR (right side in RTL) ========== -->
+  <aside class="w-64 hidden md:flex flex-col gap-2 p-4 border-l border-outline-variant bg-surface-container-low flex-shrink-0">
+    <div class="mb-4 px-2">
+      <h2 class="text-headline-sm text-primary">סינון מהיר</h2>
+      <p class="text-body-sm text-text-muted mt-1">ניהול סטטוסים</p>
+    </div>
+    <nav id="filter-nav" class="flex flex-col gap-1">
+      <button data-filter="all" class="filter-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm transition-all bg-primary-container text-on-primary-container font-semibold">
+        <span class="material-symbols-outlined text-[18px]">apps</span>
+        <span>הכל</span>
+        <span class="filter-count mr-auto bg-surface-bright/40 text-text-primary text-meta-xs px-2 py-0.5 rounded-full">0</span>
+      </button>
+      <button data-filter="pending" class="filter-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm text-on-surface-variant hover:bg-surface-variant transition-all">
+        <span class="material-symbols-outlined text-[18px] text-status-warning">pending_actions</span>
+        <span>ממתין לאישור</span>
+        <span class="filter-count mr-auto bg-surface-bright text-text-primary text-meta-xs px-2 py-0.5 rounded-full">0</span>
+      </button>
+      <button data-filter="approved" class="filter-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm text-on-surface-variant hover:bg-surface-variant transition-all">
+        <span class="material-symbols-outlined text-[18px] text-status-success">check_circle</span>
+        <span>מאושר</span>
+        <span class="filter-count mr-auto bg-surface-bright text-text-primary text-meta-xs px-2 py-0.5 rounded-full">0</span>
+      </button>
+      <button data-filter="comments" class="filter-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm text-on-surface-variant hover:bg-surface-variant transition-all">
+        <span class="material-symbols-outlined text-[18px] text-status-highlight">comment</span>
+        <span>יש הערות</span>
+        <span class="filter-count mr-auto bg-surface-bright text-text-primary text-meta-xs px-2 py-0.5 rounded-full">0</span>
+      </button>
+      <button data-filter="missing" class="filter-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm text-on-surface-variant hover:bg-surface-variant transition-all">
+        <span class="material-symbols-outlined text-[18px] text-status-danger">error</span>
+        <span>חסר תוכן</span>
+        <span class="filter-count mr-auto bg-surface-bright text-text-primary text-meta-xs px-2 py-0.5 rounded-full">0</span>
+      </button>
+      <button data-filter="upcoming" class="filter-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-body-sm text-on-surface-variant hover:bg-surface-variant transition-all">
+        <span class="material-symbols-outlined text-[18px] text-primary">event</span>
+        <span>קרוב (30 יום)</span>
+        <span class="filter-count mr-auto bg-surface-bright text-text-primary text-meta-xs px-2 py-0.5 rounded-full">0</span>
+      </button>
+    </nav>
+    <!-- System status -->
+    <div class="mt-auto pt-4 border-t border-outline-variant/50">
+      <div class="bg-surface-container rounded-lg p-3 border border-outline-variant">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined text-primary text-[16px]">info</span>
+          <span class="text-meta text-text-primary font-semibold">סטטוס מערכת</span>
+        </div>
+        <div class="flex justify-between text-meta-xs mb-1">
+          <span class="text-text-muted">מצב נוכחי:</span>
+          <span id="role-info-text" class="text-text-primary">מנהל מערכת</span>
+        </div>
+        <div class="flex justify-between text-meta-xs">
+          <span class="text-text-muted">סנכרון אחרון:</span>
+          <span class="text-text-primary">לפני דקה</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN ========== -->
+  <main class="flex-1 overflow-y-auto pb-24 flex flex-col">
+    <!-- College Filter Chips -->
+    <div class="px-margin-page pt-margin-page pb-3 bg-surface-container-low border-b border-outline-variant sticky top-0 z-20">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="material-symbols-outlined text-text-muted text-[18px]">school</span>
+        <span class="text-meta text-text-muted ml-2">מכללה:</span>
+        <div id="college-chips" class="flex gap-2 flex-wrap"></div>
+      </div>
+    </div>
+    <div id="app" class="flex-1 p-margin-page"></div>
+  </main>
+</div>
+
+<!-- ========== DEMO BAR (sticky footer) ========== -->
+<div class="fixed bottom-0 left-0 right-0 bg-surface-container-low border-t border-outline-variant px-margin-page py-2 flex items-center gap-2 z-20 text-meta">
+  <span class="material-symbols-outlined text-[16px] text-text-muted">science</span>
+  <span class="text-text-muted">דמו:</span>
+  <button onclick="simulateUpload('banner')" class="bg-surface-container border border-outline-variant rounded px-3 py-1 text-text-primary hover:border-primary-container transition-colors flex items-center gap-1">
+    <span class="material-symbols-outlined text-[14px]">upload</span>העלאת באנר
+  </button>
+  <button onclick="simulateUpload('syllabus')" class="bg-surface-container border border-outline-variant rounded px-3 py-1 text-text-primary hover:border-primary-container transition-colors flex items-center gap-1">
+    <span class="material-symbols-outlined text-[14px]">description</span>העלאת סילבוס
+  </button>
+  <button onclick="simulateCampaignLive()" class="bg-surface-container border border-outline-variant rounded px-3 py-1 text-text-primary hover:border-primary-container transition-colors flex items-center gap-1">
+    <span class="material-symbols-outlined text-[14px]">rocket_launch</span>קמפיין עלה
+  </button>
+  <button onclick="resetState()" class="mr-auto bg-surface-container border border-status-danger/40 rounded px-3 py-1 text-status-danger hover:bg-status-danger/10 transition-colors flex items-center gap-1">
+    <span class="material-symbols-outlined text-[14px]">restart_alt</span>איפוס
+  </button>
+</div>
+
+<!-- ========== DRAWER (right side, slides in from right in RTL) ========== -->
+<div id="drawer-overlay" class="drawer-overlay fixed inset-0 bg-black/75 z-40 hidden-state" onclick="if(event.target===this)closeDrawer()">
+  <div id="drawer-panel" class="drawer-panel fixed top-0 right-0 bottom-0 w-full md:w-[900px] max-w-full bg-surface flex flex-col">
+    <!-- Drawer Header -->
+    <div class="border-b border-outline-variant bg-surface-container-low p-margin-page flex items-start justify-between gap-4">
+      <div class="flex-1 min-w-0">
+        <h2 id="drawer-title" class="text-headline-md text-text-primary truncate">קורס</h2>
+        <div id="drawer-subtitle" class="flex items-center gap-3 mt-1 text-meta text-text-muted"></div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <a id="drawer-folder-link" target="_blank" class="flex items-center gap-1 px-3 py-1.5 bg-surface-container border border-outline-variant rounded text-body-sm text-text-primary hover:border-primary-container transition-colors">
+          <span class="material-symbols-outlined text-[16px]">folder_open</span>דרייב
+        </a>
+        <button onclick="closeDrawer()" class="w-9 h-9 rounded-full flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-surface-variant transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+    </div>
+    <!-- Drawer Tabs -->
+    <div id="drawer-tabs" class="px-margin-page border-b border-outline-variant bg-surface-container-low flex gap-6 overflow-x-auto"></div>
+    <!-- Drawer Body (scrollable) -->
+    <div id="drawer-body" class="flex-1 overflow-y-auto p-margin-page bg-surface"></div>
+    <!-- Drawer Footer (sticky actions) -->
+    <div id="drawer-footer" class="border-t border-outline-variant bg-surface-container-low p-margin-page">
+      <!-- Progress -->
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-meta text-text-muted">התקדמות אישור קורס:</span>
+        <div class="flex-1 h-2 bg-surface-bright rounded-full overflow-hidden flex">
+          <div id="dr-bar-approved" class="h-full bg-status-success" style="width:0%"></div>
+          <div id="dr-bar-rejected" class="h-full bg-status-danger" style="width:0%"></div>
+          <div id="dr-bar-pending" class="h-full bg-status-warning" style="width:0%"></div>
+        </div>
+        <span id="dr-bar-text" class="text-meta text-text-primary font-semibold">0/0</span>
+      </div>
+      <!-- Action Buttons row -->
+      <div class="flex items-center justify-between gap-3">
+        <button onclick="exportApprovedToMeta()" class="role-admin-only flex items-center gap-2 bg-primary-container text-on-primary-container px-4 py-2 rounded font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed" id="btn-export-meta">
+          <span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+          ייצא להעלאה למטא
+        </button>
+        <div class="text-meta text-text-muted" id="drawer-footer-hint">לחץ אישור/דחייה ליד כל פיסת תוכן בטאב הנוכחי</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== NOTIFICATIONS PANEL (slides in from left) ========== -->
+<div id="panel-notif" class="side-panel fixed top-0 right-auto left-0 bottom-0 w-96 max-w-full bg-surface-container border-l border-outline-variant z-50 flex flex-col" style="transform: translateX(-100%);">
+  <div class="p-4 border-b border-outline-variant flex items-center gap-3">
+    <span class="material-symbols-outlined text-primary-container">notifications</span>
+    <h3 class="text-headline-sm flex-1">התראות</h3>
+    <button onclick="markAllRead()" class="text-meta-xs text-text-muted hover:text-text-primary px-2 py-1 rounded transition-colors">סמן הכל כנקרא</button>
+    <button onclick="togglePanel('notif')" class="w-8 h-8 rounded-full hover:bg-surface-variant flex items-center justify-center">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+    </button>
+  </div>
+  <div id="notif-list" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+</div>
+
+<!-- ========== LOG PANEL (slides in from left) ========== -->
+<div id="panel-log" class="side-panel fixed top-0 right-auto left-0 bottom-0 w-96 max-w-full bg-surface-container border-l border-outline-variant z-50 flex flex-col" style="transform: translateX(-100%);">
+  <div class="p-4 border-b border-outline-variant flex items-center gap-3">
+    <span class="material-symbols-outlined text-primary-container">history</span>
+    <h3 class="text-headline-sm flex-1">לוג פעולות</h3>
+    <button onclick="togglePanel('log')" class="w-8 h-8 rounded-full hover:bg-surface-variant flex items-center justify-center">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+    </button>
+  </div>
+  <div id="log-list" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+</div>
+
+<!-- ========== IMAGE MODAL ========== -->
+<div id="img-modal" class="fixed inset-0 bg-black/90 z-50 hidden-state flex items-center justify-center p-8" onclick="this.classList.add('hidden-state')">
+  <button onclick="event.stopPropagation();document.getElementById('img-modal').classList.add('hidden-state')" class="absolute top-4 left-4 w-10 h-10 bg-surface-container border border-outline-variant rounded-full flex items-center justify-center text-text-primary hover:bg-surface-variant">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+  <img id="img-modal-src" class="max-w-[95%] max-h-[95vh] rounded-lg" alt="" />
+</div>
+
+<script>
+// ============================================================
+// DATA — 3 colleges (preserved verbatim)
+// ============================================================
+const TODAY = new Date("2026-05-14");
+
+const DATA = {
+  "מרכז הבנייה הישראלי": {
+    folder_id: "1xQKBw5w8YwlU44VGj4ojugeN50d6T2kx",
+    courses: [
+      { id: "innovation", name: "מובילי חדשנות בבנייה", folder_id: "18YMp8OBVLcCSc5rHD0IqnTgJTOF_oC9L",
+        brochure: null, syllabus: null,
+        banner_folders: [
+          { id: "1cz23A2qtYQIfs9nBDUtXp6Iclxh5yWDf", title: "קבלנים", brochure: "1CgSb9XoaGqpL925ihugop23J9ss2KHtq",
+            banners: ["1V4GI9wFng4SINO--idHcs_t3uyybqUrH","17h3TT7stNgXaNUtJLCrYoc3l6ghnpsqr","1nRRF7q1bdw-5Zzgw80_lqPoBUwBRjs1V","1gDjOB9KIQQ5UVMUfa6Opf8WfjGduGOgM","1BOmRRGIO_ClzFGsGN3HJT_nFOHOO0BVM"] },
+          { id: "1Km1Lu0STKa3yF-iF_b-3lyX4KVBRiB1y", title: "רשויות מקומיות", brochure: "1kzepsjQShv7R6XOCdQKy0crEuEFBuYEl",
+            banners: ["17OdBeKpghpw00RNOgwDdHXNNRrVRPZ8w","1OJhwbQxA4XpimW6SCrhNFo3LhBiftGv4","13Ft4WJ6BczdF8RU0hJZ69sHxY9IzhPMr","1v-q94IXfkoHJQonmLW-cYsx0WfUP21s9","1FHCgtyhjGfHwmqW7aTJOluv1V0VQrF1l","17Ke3DytHnzADkaXDzQuV_roG3yInVwlb"] }
+        ],
+        next_date: "25.5.2026", next_location: "נתניה",
+        campaigns: ["07_innovation-kablanim_traffic","08_innovation-rashuyot_traffic"] },
+      { id: "safety_helper", name: "עוזר בטיחות", folder_id: "1jj8Ps9Oxm2mwUeRMNz5zXAatvgCt_KYD",
+        syllabus: { id: "1qe76AljkYlWO1HHc9LukmCCcuaIIRHYW" }, banner_folders: [], campaigns: [] },
+      { id: "work_manager", name: "מנהל עבודה בבנייה", folder_id: "18gEhHKK0FedK1gxHY0cnHd8TOcH5RL7F",
+        brochure: { id: "1KQH_WugdLAQszZhYRI0r7GDobMrI2RW3" }, banner_folders: [],
+        next_date: "2.8.2026", next_location: "נתניה", campaigns: [] },
+      { id: "blueprint_reading", name: "קריאת תוכניות", folder_id: "1lkVHfo9jcm63Ykf5FcdsVQcChr1l4QHq",
+        syllabus: { id: "193pf37TeqcZ2BvYJSndqYwxpm0t5p6hb" }, banner_folders: [],
+        next_date: "6.5.2026", next_location: "נתניה", campaigns: [] },
+      { id: "build_home", name: "בנה ביתך", folder_id: "1NQw7LS39uN-O9Uk2NG3LFKcAPOIprSHO",
+        syllabus: { id: "1EhTCX-YasMcvmc6aSHMI7sOX2U0s-efq" }, banner_folders: [],
+        next_date: "17.7.2026", next_location: "נתניה", campaigns: [] },
+      { id: "safety_certification", name: "בטיחות למנהלי עבודה — הסמכה", folder_id: "1qeKg0636Ic2wh3bcmrzRoMjJAga2nOgg",
+        syllabus: { id: "1iuu6gASF5xxQZhf-j6ej_k8Qw5xnq6MH" }, banner_folders: [],
+        next_date: "11.5.2026", next_location: "נתניה (זום)", campaigns: [] },
+      { id: "project_management", name: "ניהול פרויקטים", folder_id: "1WvTHszrcKtWyioDuda5zDufD-liZrRs3",
+        syllabus: { id: "1u5V5bhbumkBTt2l0Oxoqx0FM7T2Suqdr" },
+        banner_folders: [{ id: "1uB6CiHGyX1UH-aW9pJF3tIbeoNgAOOOR", title: "11.6.26",
+          banners: ["15iq8kyAnCIC-zZA7TOHw2tcxYMtBDwcC","1hpDCewwX0p86eDF42E7NsGtq9uK2d5OS","1cxvbsqBr_d1rtdDloVtXLE2TylLBkA2D","1_qV1IK5o79UerqXh4pXdU2Qi-FOgHcUW","1TAM8erCPQfzUfXYV7YTYJUmPNV6pW57p"] }],
+        next_date: "11.6.2026", next_location: "תל אביב", campaigns: [] },
+      { id: "otem_morsheh", name: "אוטם מורשה", folder_id: "1GxXNWG0q02007Ek29lNfh8bwSDr3KOmN",
+        syllabus: { id: "1o2o9maH8lL5Ixr9vxSnd4gGkhAjKeaD7" },
+        banner_folders: [{ id: "1Sva7mNqKDM6P8RlKe3kh6LiriWQB6_EY", title: "נתניה — איטום 3.6.2026",
+          banners: ["1MG6RogqmmrZSMN5TdF8VtOPypx_CW9MG","1zEpQj9LILSGc_9DZ0EBm9kZaKnn_KBXC","1KP8hBkD6KvBInFwChekxSzRHkWIiURQG","1YR17X0Ih66rpSQPlzI4v2y6XXAwPU56Q","1FltAUtV_EQfmWGUltNhqNdCS1grbkESn","1WfFeuKjAh4cSYiO_aBz4cjFfYNXp-rBi","1ANDNSkeUJqmxXSd-ceAlOCXQI31ZShwA"] }],
+        next_date: "3.6.2026", next_location: "נתניה", campaigns: ["01_otem-morsheh_netanya_3-6"] },
+      { id: "electromechanical", name: "מערכות אלקטרו מכניות", folder_id: "1zBA_FSjXXWcD-aiRFdpaElK_Vx8kB6w3",
+        syllabus: { id: "125BQkm5kkptn8y3NMJ7YMpB6GXHa-jT6" }, banner_folders: [],
+        next_date: "12.5.2026", next_location: "נתניה + זום", campaigns: [] },
+      { id: "plumbing", name: "אינסטלציה / שרברבות", folder_id: "1p0Ziv_ZyoDwiEzhd7FUAI0psyCKZwYvY",
+        brochure: { id: "1ElI-nZTnnj3urHiLili4YmQwIGMvBHya" }, syllabus: { id: "1z9OASb6-MtoTlJesFNzusz6Tr1E9ANxP" },
+        banner_folders: [{ id: "1askIbr-NuQuS8pI8dP83ASV7K6K_tu6u", title: "שרברבות 17.5 נתניה",
+          banners: ["1RwE9IH_T-zB_iEUE2enDBfFVsW5JmMq-","19NtBUBxZeh1rIksm8bfK35qc_J4Q5Wg6","10X6m1632tHgtvOLF4CdGab7VSITn3ZrV","1RPeiTY2010Va7Jd1ZwVGIJAEOxnnAUGz","1E7A6gDM96gYZJdlNwBKYH7lYP3Gd-eHk","1OSpB7_Jt9X8hF2KMqYtazIMtxxoR8qCW"] }],
+        next_date: "17.5.2026", next_location: "נתניה", campaigns: ["02_plumbing_netanya_17-5"] },
+      { id: "construction_supervision", name: "פיקוח בנייה", folder_id: "1lJE4ay-clNRDMSosdftVc_uJIJsWK-HB",
+        syllabus: { id: "1IiClvUy1KArpGUJifdAolS-CRSavUO2O" },
+        direct_banners: ["12Tsd-Z4MeYJozQKQfPj30uwufS2eyIn6","1ok1UuJDtlapSWxzlsRUGLOvPoXTLTW01","1dUkYjgYlb4_IzZeZWwfcwAH5yRCyS52x","1iKmb3qwBxAKjw7huVg-RcpjARwwBgqAe","1iRGC6qt21opmQ2Jtw-P9eAR2ryPnYaLs"],
+        banner_folders: [],
+        next_date: "18.5.2026", next_location: "נתניה", campaigns: ["06_pikuach-bnia_netanya_18-5_BC"] },
+      { id: "safety_controller", name: "בקר בטיחות", folder_id: "1vm3RxwneZpzgTrpqFXXcUF5n-Ebw6jVT",
+        brochure: { id: "1LKVhrEF0uWtC4ZweHopLRjnbJcYy0GiV" },
+        banner_folders: [{ id: "1SBEtCTDo9I3EIifZpfPww_bLqfI9LEyN", title: "10.06.2026 נתניה",
+          banners: ["1RSzQjPzpT9zegO6f4nwVD1313CkJlXBU","1tJrDDLvjajczFpDX1VuCWxnVbgPtAsPx","1f5GaQECkyBHHC3SS6ov9G-kqZ5MC3v2p","1mYVEyqPScJ7tY8FnB18rM7HutHOLZLXB","1yFteFUcqykefOWT7WbPJ63q73ysnBtzs","1TmdNWQ9YeRfzqh6Iuf89RpZ7NXZ9HplF"] }],
+        next_date: "10.6.2026", next_location: "נתניה", campaigns: ["03_safety-controller_netanya_10-6"] }
+    ]
+  },
+  "אינטק (נדל״ן)": {
+    folder_id: "1RFu556ctJ_7fifEgVtgQXSU5ARwonBJw",
+    courses: [
+      { id: "senior_facility_manager", name: "מנהל בכיר אחזקות", folder_id: "1p5gRYRlIqjcG2shugQ-jXsYYgXC1A2gK",
+        syllabus: { id: "1K_pasPu1n58YVsecSCPb3mhO3Y50N_Bn" }, banner_folders: [],
+        next_date: "28.6.2026", next_location: "תל אביב", campaigns: [] },
+      { id: "realestate_sales", name: "מכירות ושיווק נדל״ן", folder_id: "1ozgoWMyFJDoaz9OY46Ze-DJPhiz3eL6C",
+        syllabus: { id: "19WeSwzTHavfobyIcYp6JkVCWS3ukjmcx" }, banner_folders: [],
+        next_date: "30.6.2026", next_location: "תל אביב", campaigns: [] },
+      { id: "realestate_initiation", name: "ייזום נדל״ן", folder_id: "12yT0LtBeFpcxjPiHX7LBXhWaoyGuLbJj",
+        syllabus: { id: "17Iwq5exLsfECZG4y0M9wW_nP0iF9arTx" }, banner_folders: [],
+        next_date: "22.6.2026", next_location: "נתניה", campaigns: [] },
+      { id: "mortgage_advisor", name: "יועצי משכנתאות", folder_id: "1DpjcREWOIrtoXwfLjxDWn56_E2RDTMt3",
+        brochure: { id: "1VvRDZjfmoxKjLkHrp5TFA--qY80oToAZ" }, banner_folders: [],
+        next_date: "5.7.2026", next_location: "תל אביב", campaigns: [] },
+      { id: "facility_management", name: "אחזקות וניהול מבנים", folder_id: "1x_ijrV9LNNkd4EQHD-9JysGd5strlsGh",
+        syllabus: { id: "1XEbpDUMHnQ_xz0rY5ElQDsJSRbtOIiYO" }, banner_folders: [],
+        next_date: "29.7.2026", next_location: "תל אביב", campaigns: [] },
+      { id: "ai_realestate", name: "מאסטר AI לנדל״ן", folder_id: "1fo3qasB2JxQtBXJOK75G58lnGAVw0iuk",
+        brochure: { id: "1EwvJyKeeZ-jy-8Q9phuVb63aL1F6RTtJ" },
+        banner_folders: [{ id: "1qe8eNEomTTmj_eq0ROKrk61sBwY9J2Oj", title: "31.5.2026",
+          banners: ["1wbJ8zKlxwoZfjLOSUhgwf1dDz88f_qA5","1zsqvKf9XqaOSDtCTxLcbie3-9_PbV03U","17w5Yru2Fc_TWd2boRfeTFouuI-Vymsqg","17LbVVt1kaiEqB9Uigq4kI1UkfHPT_O0M","16UXijiErmOkJeKHoxKc4bV0VA8yBpeky","1JSpNw7vemb5IMdu5g79xl3x16f6pZ80f","1FeveaHEUP1b2q8noYTU1pb6vp8-OMTBh"] }],
+        next_date: "31.5.2026", next_location: "נתניה", campaigns: ["05_ai-realestate_31-5"] }
+    ]
+  },
+  "אולטימה": {
+    folder_id: "1E_pinogfvlmMpSBU3WLR51V3EIeoOppg",
+    courses: [
+      { id: "tenant_changes", name: "שינויי דיירים — תיאום אדריכלי", folder_id: "1uzr6IBHgkrjFzGF6PyTjW0vEIvXssaCw",
+        syllabus: { id: "1CNY0z4Zu1FiioIVaN6XL8ELtK9kXpTiy" },
+        banner_folders: [{ id: "1S0ADYmbXCTUU_3wYb6pdlIvZDnuzTYVf", title: "באנרים שינויי דיירים", banners: [] },
+                         { id: "1xUhb266E8RzN087JpwUSzRvFbsKtcp0n", title: "11.6", banners: [] }],
+        next_date: "14.5.2026", next_location: "נתניה", campaigns: ["07_tenant-changes_netanya_11-6"] },
+      { id: "interior_design", name: "עיצוב פנים", folder_id: "1CvMm6HoBt6pknVTinuj81qPiH7zdMY9j",
+        banner_folders: [{ id: "1Fr-gq9YkGoHly7FEgHSpj2uGy46RThtm", title: "עיצוב פנים — באנרים",
+          banners: ["1jKeHxPwBKo0eqG8PFoYygZxECGc9bAgq","1fdDhF4b-2IKkIpl9-YIGLxZwiNeoSl7J","1OTMBXhuJsNTM2hq38kY82VN0WADMBxoP","1Q8UhRa890OVJhOj9bXyhBdWSDLau3h8c","1kf6B1dX2mwstpqYUKnPbGZ35FIgHtB56"] }],
+        next_date: "25.5.2026", next_location: "נתניה", campaigns: ["04_interior-design_25-5","video_mothers","video_soldiers"] },
+      { id: "home_styling", name: "הום סטיילינג", folder_id: "1aE6QCc50pLvPSX7ppj1OJvO-ssmEkrRl",
+        brochure: { id: "1LmdXYlGRowXXDpQfvRuHePzLcsxX1N9x" },
+        banner_folders: [
+          { id: "1te9LKo63m_9a47GZrxxULVtLUim5l1Iy", title: "תל אביב 16.6",
+            banners: ["1heW8TkaQBJf6W2n607icj5O2oNVD4gWo","1yz32Q0nTgPLYH-PlNNnoiYAY8g8KR5Us","1SrNNk4VaLeI226-0fvLmLXOxToVgWU5X","1GgbGQoc5p7biJMW66QjBOpAebfAmhq4a","1y1cHgGaTLoBopopYv4qX0NbakOZNNdtN"] },
+          { id: "101FrcpFe5s_iZwB4g-DeAqq5uYlCXa8l", title: "נתניה 28.6",
+            banners: ["1Gk5fQBeYxGP3XQtL-J0k1e2J-rAL_LHb","14aR1gaqS0H-gU8yS85QdD0NNB_ox3iuZ","1IRNV_C2DaIrfo4JTYmV2TOfHodo6XYSa","1sva8sC0SNl15lShRl8AoU71aFl4blot8","1phkD0A4PzVJdDgCxiLXz5xSCTnY99LV3"] }
+        ],
+        next_date: "19.5.2026", next_location: "תל אביב", campaigns: ["02_home-styling_tel-aviv_16-6","03_home-styling_netanya_28-6"] }
+    ]
+  }
+};
+
+// ============================================================
+// CAMPAIGNS — real ad copy from Meta export 14.5.2026
+// ============================================================
+const CAMPAIGNS = {
+  "02_home-styling_tel-aviv_16-6": { title:"הום סטיילינג ת״א 16.6", status:"live", adset_name:"הום סטיילינג תל אביב | 16.6.2026 | אולטימה", variants:[
+    { ad_title:"רוצה להפוך אהבה לעיצוב למקצוע?", ad_text:`יש לך אהבה לעיצוב ורצון להפוך אותה לכלים מקצועיים?
+
+קורס הום סטיילינג של אולטימה, מבית מרכז הבנייה הישראלי, נועד לתת לך בסיס מעשי לעיצוב והלבשת חללים — משלב הרעיון והקונספט ועד בניית שפה עיצובית, עבודה עם צבעים, חומרים, תאורה ופרזנטציה ללקוח.
+
+במהלך הקורס תלמדו עם מרצים מובילים, תתנסו בתרגולים מעשיים, תבנו תיק עבודות ראשוני ותקבלו כלים שיעזרו לכם להתחיל להתקדם בעולם העיצוב.
+
+📍 תל אביב
+📅 פתיחה: 16.6.2026
+
+✅ כלים מעשיים להלבשת הבית
+✅ פיתוח שפה עיצובית אישית
+✅ מרצים מובילים וניסיון מהשטח
+✅ מתאים לחובבי עיצוב, מעצבים בתחילת הדרך ומי שמחפש/ת קריירה שנייה
+
+רוצה לבדוק אם הקורס מתאים לך?
+השאר/י פרטים ונחזור אליך עם כל המידע.` }
+  ], screening_q:"אין שאלת סינון", screening_opts:[], form_id:"2076707549726849", make_id:"9208196" },
+
+  "03_home-styling_netanya_28-6": { title:"הום סטיילינג נתניה 28.6", status:"live", adset_name:"הום סטיילינג נתניה | 28.6.2026 | אולטימה", variants:[
+    { ad_title:"רוצה להפוך אהבה לעיצוב למקצוע?", ad_text:`יש לך אהבה לעיצוב ורצון להפוך אותה לכלים מקצועיים?
+
+קורס הום סטיילינג של אולטימה, מבית מרכז הבנייה הישראלי, נועד לתת לך בסיס מעשי לעיצוב והלבשת חללים — משלב הרעיון והקונספט ועד בניית שפה עיצובית, עבודה עם צבעים, חומרים, תאורה ופרזנטציה ללקוח.
+
+במהלך הקורס תלמדו עם מרצים מובילים, תתנסו בתרגולים מעשיים, תבנו תיק עבודות ראשוני ותקבלו כלים שיעזרו לכם להתחיל להתקדם בעולם העיצוב.
+
+📍 נתניה
+📅 פתיחה: 28.6.2026
+
+✅ כלים מעשיים להלבשת הבית
+✅ פיתוח שפה עיצובית אישית
+✅ מרצים מובילים וניסיון מהשטח
+✅ מתאים לחובבי עיצוב, מעצבים בתחילת הדרך ומי שמחפש/ת קריירה שנייה
+
+רוצה לבדוק אם הקורס מתאים לך?
+השאר/י פרטים ונחזור אליך עם כל המידע.` }
+  ], screening_q:"אין שאלת סינון", screening_opts:[], form_id:"2076707549726849", make_id:"9208196" },
+
+  "04_interior-design_25-5": { title:"עיצוב פנים 25.5", status:"live", adset_name:"עיצוב פנים | 25.5.2026 | אולטימה", variants:[
+    { ad_title:"קורס עיצוב פנים באולטימה", ad_text:`אם תמיד היה לך חיבור לעיצוב, חללים ואסתטיקה — אולי הגיע הזמן להפוך את זה למקצוע.
+
+מסלול עיצוב פנים של אולטימה, מבית מרכז הבנייה הישראלי, מעניק הכשרה מקצועית ומעשית שמשלבת תכנון, עיצוב, קריאת תוכניות, עבודה עם חומרים וכלים עדכניים לעולם העיצוב.
+
+במהלך הלימודים תקבלי כלים אמיתיים מהשטח, היכרות עם תהליכי בנייה ושיפוץ, ליווי של מרצים פעילים בענף וחיבור לעולם מקצועי שיכול לפתוח לך דרך לקריירה יצירתית ומבוקשת.
+
+📍 נתניה ותל אביב
+📅 פתיחה: 25.5.2026
+
+✅ מסלולי בוקר וערב
+✅ הכשרה מקיפה ומעשית
+✅ מתאים גם להסבה מקצועית
+
+רוצה לבדוק אם זה המסלול שמתאים לך?
+השאירי פרטים ונחזור אלייך עם כל המידע.` }
+  ], screening_q:"אין שאלת סינון", screening_opts:[], form_id:"2076707549726849", make_id:"9208196" },
+
+  "07_tenant-changes_netanya_11-6": { title:"שינוי דיירים נתניה 11.6", status:"live", adset_name:"שינויי דיירים נתניה | 11.6.2026 | אולטימה", variants:[
+    { ad_title:"קידום מקצועי למעצבי פנים — קורס שינויי דיירים", ad_text:`קורס תיאום וניהול אדריכלי — תפקיד חדש שנוצר מצורך אמיתי בענף.
+
+עם היקפי ההתחדשות העירונית והבנייה הרוויה בישראל, נוצר צורך אקוטי בתפקיד חדש: מתאם/ת ניהול אדריכלי (שינויי דיירים). זה הגורם המקצועי שמגשר בין המערכת הקבלנית לבין הצרכים הפרטניים של הדיירים, מנהל את לב הבית — אינסטלציה, חשמל ומחיצות — ומונע עיכובים וליקויי תכנון.
+
+קורס תיאום וניהול אדריכלי של אולטימה, מבית מרכז הבנייה הישראלי, מכשיר אנשי מקצוע למקצוע שמשלב מומחיות בעיצוב עם ידע הנדסי-תכנוני, ופותח שער לעבודה מול חברות יזמיות וקבלניות בפרויקטים של עשרות ומאות יחידות דיור.
+
+📍 נתניה
+📅 פתיחה: 11.6.2026
+
+✅ התמחות מקצועית מבוקשת בענף הנדל"ן
+✅ פתח לעבודה מול חברות יזמיות וקבלניות
+✅ הרחבת תיק העבודות והכנסה משמעותית
+✅ ליווי של מרצים פעילים בענף
+
+מעצבת פנים שרוצה לקפוץ קומה מקצועית?
+השאירי פרטים ונחזור אליך עם כל המידע.` }
+  ], screening_q:"הקורס מיועד למעצבי ומעצבות פנים. האם יש לך רקע מקצועי בעיצוב פנים?", screening_opts:["מעצב/ת פנים עם מעל שנתיים ניסיון","מעצב/ת פנים עד שנתיים ניסיון","אין לי רקע בעיצוב פנים"], form_id:"1926078731358412", make_id:"9208335" },
+
+  "video_mothers": { title:"וידאו — קהל אמהות", status:"live", adset_name:"עיצוב פנים | קהל אמהות | אולטימה", variants:[
+    { ad_title:"עיצוב פנים באולטימה — מקצוע שמתאים לך", ad_text:`לימודי עיצוב פנים באולטימה, מבית מרכז הבנייה הישראלי, מתאימים במיוחד לאמהות שרוצות מקצוע יצירתי, גמיש ומשתלם — שאפשר לעבוד בו מהבית או כעצמאית, על פי הקצב שלך.
+
+הקורסים מציעים מסלולי בוקר נוחים, ליווי אישי של מרצות מהענף, וחיבור לעולם מקצועי שמאפשר איזון בין משפחה לקריירה.
+
+✅ מסלולי בוקר נוחים לאמהות
+✅ הכשרה מעשית עם תיק עבודות
+✅ ליווי אישי ממרצות בענף
+✅ מקצוע שאפשר לעבוד בו עצמאית
+
+📍 נתניה / תל אביב
+
+רוצה לבדוק אם המסלול מתאים לך?
+השאירי פרטים ונחזור אליך עם כל המידע.` }
+  ], screening_q:"אין שאלת סינון", screening_opts:[], form_id:"2076707549726849", make_id:"9208196" },
+
+  "video_soldiers": { title:"וידאו — חיילות משוחררות", status:"live", adset_name:"עיצוב פנים | קהל חיילות משוחררות | אולטימה", variants:[
+    { ad_title:"עיצוב פנים באולטימה — מקצוע שמתאים לך", ad_text:`לימודי עיצוב פנים באולטימה, מבית מרכז הבנייה הישראלי, מתאימים במיוחד לאמהות שרוצות מקצוע יצירתי, גמיש ומשתלם — שאפשר לעבוד בו מהבית או כעצמאית, על פי הקצב שלך.
+
+הקורסים מציעים מסלולי בוקר נוחים, ליווי אישי של מרצות מהענף, וחיבור לעולם מקצועי שמאפשר איזון בין משפחה לקריירה.
+
+✅ מסלולי בוקר נוחים לאמהות
+✅ הכשרה מעשית עם תיק עבודות
+✅ ליווי אישי ממרצות בענף
+✅ מקצוע שאפשר לעבוד בו עצמאית
+
+📍 נתניה / תל אביב
+
+רוצה לבדוק אם המסלול מתאים לך?
+השאירי פרטים ונחזור אליך עם כל המידע.` },
+    { ad_title:"לימודי עיצוב פנים באולטימה", ad_text:`חיילות משוחררות — מתלבטות מה ללמוד אחרי הצבא?
+
+לימודי עיצוב פנים באולטימה, מבית מרכז הבנייה הישראלי — הדרך להפוך תשוקה לעיצוב למקצוע יצירתי ומבוקש.
+
+באולטימה תקבלי הכשרה מקצועית ומעשית שכוללת תכנון, קריאת תוכניות, עבודה עם חומרים וכלים עדכניים מעולם העיצוב — וליווי של מרצים פעילים בענף שיחברו אותך לקריירה אמיתית.
+
+✅ מתאים לפיקדון חיילות משוחררות
+✅ מסלולי בוקר וערב
+✅ מרצים מובילים מענף העיצוב
+✅ תיק עבודות + ליווי לקריירה
+
+📍 נתניה / תל אביב
+
+רוצה לבדוק אם המסלול מתאים לך?
+השאירי פרטים ונחזור אליך עם כל המידע.` }
+  ], screening_q:"אין שאלת סינון", screening_opts:[], form_id:"2076707549726849", make_id:"9208196" },
+
+  "01_otem-morsheh_netanya_3-6": { title:"אוטם מורשה נתניה 3.6", status:"live", adset_name:"אוטם מורשה נתניה | 3.6.2026 | מרכז הבנייה הישראלי", variants:[
+    { ad_title:"קורס אוטם מורשה — מקצוע מבוקש בענף הבנייה", ad_text:`איטום הוא אחד הנושאים הקריטיים בענף הבנייה — והגורם המספר 1 לתביעות בגין ליקויי בנייה.
+
+קורס אוטם מורשה במרכז הבנייה הישראלי מכשיר אנשי שטח לעבודות איטום מקצועיות לפי התקנים העדכניים: איטום גגות, מרתפים, חדרים רטובים, פוליאוריאה ועוד.
+
+הקורס בניהולו המקצועי של משרד מרטון מהנדסים — מומחי איטום בעלי שם — ובלימוד מהמרצים המובילים בתחום בארץ.
+
+📍 נתניה — אצטדיון מרים
+📅 פתיחה: 3.6.2026
+
+✅ 20 מפגשים
+✅ סיורי שטח, הדגמות ומבחן מעשי
+✅ זכאות לתעודת אוטם מורשה לבעלי ניסיון מוכח בהלחמת יריעות
+✅ מקצוע מבוקש עם פוטנציאל הכנסה גבוה
+
+רוצה לבדוק אם הקורס מתאים לך?
+השאירו פרטים ונחזור אליכם עם כל המידע.` }
+  ], screening_q:"הקורס דורש ניסיון מעשי בעבודות איטום ובהלחמת יריעות ביטומניות. האם יש לך?", screening_opts:["ניסיון בעבודות איטום","ניסיון בהלחמת יריעות ביטומניות","אין לי ניסיון רלוונטי"], form_id:"1565748978245018", make_id:"9208310" },
+
+  "02_plumbing_netanya_17-5": { title:"שרברבות 1+2 נתניה 17.5", status:"paused", adset_name:"שרברבות תברואתית 1+2 נתניה | 17.5.2026 | מרכז הבנייה הישראלי", variants:[
+    { ad_title:"שרברבות תברואתית — מקצוע מבוקש במימון מלא", ad_text:`מחפש מקצוע יציב ומבוקש בענף הבנייה?
+
+קורס שרברבות תברואתית 1+2 במרכז הבנייה הישראלי מכשיר אותך לעבודה מקצועית בתשתיות מים, ביוב וניקוז — עם דגש על מיומנויות פרקטיות, התקנת כלים סניטריים, מערכות צנרת, ועמידה בדרישות משרד הבריאות ומכון התקנים.
+
+📍 נתניה
+📅 פתיחה: 17.5.2026
+
+✅ ידע מקצועי ותיאורטי מקיף
+✅ סדנאות מעשיות וסיוע בהשמה
+✅ קורס במימון מלא
+✅ תעודת שרברבות תברואתית 1+2
+✅ אפשרות התקדמות לסוג 3 לאחר שנתיים
+
+הבוגרים יכולים להשתלב בעבודה במגזר הציבורי והפרטי — כעובדים מקצועיים או עצמאיים.
+
+רוצה לבדוק אם הקורס מתאים לך?
+השאירו פרטים ונחזור אליכם עם כל המידע.` }
+  ], screening_q:"הקורס דורש מינימום 10 שנות לימוד ומעבר ועדת קבלה פנימית. האם יש לך?", screening_opts:["10 שנות לימוד + ניסיון בעבודות טכניות","10 שנות לימוד ללא ניסיון מקצועי","פחות מ-10 שנות לימוד"], form_id:"2211918982957889", make_id:"9208323", warn:"אד סט בהשהיה במטא — לבדוק האם זה מכוון או טעות" },
+
+  "03_safety-controller_netanya_10-6": { title:"בקר בטיחות נתניה 10.6", status:"live", adset_name:"בקר בטיחות נתניה | 10.6.2026 | מרכז הבנייה הישראלי", variants:[
+    { ad_title:"קורס בקר בטיחות — המקצוע החדש של ענף הבנייה", ad_text:`התפקיד החדש שכל אתר בנייה זקוק לו — בקר בטיחות.
+
+עם החמרת התקנות והרגולציה החדשה יש חובה לבקר בטיחות בכל אתר בנייה, התפקיד הפך לאחד המבוקשים ביותר בענף.
+
+קורס בקר בטיחות במרכז הבנייה הישראלי, בניהולו של חנן היכרי — מומחה בטיחות מוביל ומדריך עבודה בגובה — נותן לך את הכלים הפרקטיים והידע העדכני ביותר.
+
+📍 נתניה (3 מפגשי זום + סיור באתר בנייה פעיל + מפגש סיכום פרונטלי)
+📅 פתיחה: 10.6.2026
+
+✅ למידה ישירות מאחד המומחים המובילים בתחום
+✅ שליטה ברגולציה ובחוק העדכניים
+✅ סיור פרקטי באתר בנייה פעיל
+✅ ארגז כלים מוכן לשטח: טפסי דיווח, רשימות תיוג ודוחות חובה
+✅ תעודת בקר בטיחות מטעם מכללת מרכז הבנייה הישראלי
+
+הקורס מיועד למהנדסים אזרחיים, הנדסאים וממוני בטיחות מענף הבנייה.
+
+רוצה לבדוק אם הקורס מתאים לך?
+השאירו פרטים ונחזור אליכם עם כל המידע.` }
+  ], screening_q:"הקורס דורש ניסיון תעסוקתי בענף הבנייה. האם יש לך?", screening_opts:["אני מהנדס אזרחי / הנדסאי בענף הבנייה","אני ממונה בטיחות בענף הבנייה","אין לי ניסיון רלוונטי"], form_id:"1610223336942168", make_id:"9208312" },
+
+  "05_ai-realestate_31-5": { title:"מאסטר AI לנדל״ן 31.5", status:"live", adset_name:`מאסטר AI לנדל"ן ליועצים משפטיים | 31.5.2026 | מרכז הבנייה הישראלי`, variants:[
+    { ad_title:`מאסטר AI לנדל"ן ליועצים משפטיים`, ad_text:`עולם המשפט הנדל"ני משתנה. הגיע הזמן לקחת צעד אל העתיד.
+
+קורס מאסטר AI לנדל"ן ליועצים משפטיים במכללת מרכז הבנייה הישראלי — מעבר מייעוץ משפטי קלאסי לניהול סיכונים אלגוריתמי בעסקאות מקרקעין עתירות הון.
+
+בקורס תלמדו לרתום טכנולוגיות AI מתקדמות לפתרון בעיות מעשיות במקרקעין:
+
+✅ זיהוי אוטומטי של "מוקשים" משפטיים בנסחי טאבו וחוזים מרובים
+✅ חיזוי סיכוני מיסוי וניהול בדיקות נאותות (DD) מבוססות AI
+✅ מודלים אלגוריתמיים לגישור ויישוב סכסוכים — "גישור מכוון הכרעה"
+✅ הקמת סוכני AI אוטונומיים לניהול ערבויות חוק מכר ושינויי דיירים
+✅ הנדסת פרומפטים מתקדמת ב-Claude, Gemini ו-ChatGPT
+
+הקורס בניהולו של עו"ד ונוטריון אברהם ללום — דוקטורנט למשפטים, מפתח מודל "גישור מכוון הכרעה" עם 20 שנות ניסיון בעסקאות נדל"ן מורכבות בישראל.
+
+📍 נתניה — קמפוס הנדל"ן, אצטדיון מרים (ימי א')
+📅 פתיחה: 31.5.2026
+
+מיועד לעורכי דין ויועצים משפטיים בחברות נדל"ן יזמיות, קבלניות ועירונית.
+
+רוצה לבדוק אם הקורס מתאים לך?
+השאירו פרטים ונחזור אליכם עם כל המידע.` }
+  ], screening_q:`הקורס מיועד לאנשי מקצוע בעלי תפקיד משפטי בחברות נדל"ן. האם יש לך?`, screening_opts:[`אני עורך/ת דין בחברת נדל"ן`,`אני יועץ/ת משפטי/ת בחברת נדל"ן`,"אין לי ניסיון רלוונטי"], form_id:"2999719907043680", make_id:"9208321" },
+
+  "06_pikuach-bnia_netanya_18-5_BC": { title:"פיקוח בנייה נתניה 18.5", status:"live", adset_name:"פיקוח בנייה נתניה | 18.5.2026 | מרכז הבנייה הישראלי", variants:[
+    { ad_title:"קורס פיקוח בנייה — אצטדיון נתניה", ad_text:`רוצה להתמקצע בניהול ופיקוח של פרויקטי בנייה?
+
+קורס פיקוח בנייה במרכז הבנייה הישראלי מבוסס על שנים של ניסיון בענף ובשיתוף פעולה עם המומחים המובילים בארץ — אדריכלים, מהנדסים, כלכלנים ויועצים.
+
+הקורס מקיף את כל שלבי הבנייה: מפיתוח וביסוס, דרך השלד והגמר, ועד קבלת המפתח — תוך הבנה מעמיקה של תפקיד המפקח ואחריותו בשטח.
+
+📍 מרכז הבנייה הישראלי, אצטדיון נתניה
+📅 פתיחה: 18.5.2026
+
+✅ 17 מפגשים כולל סיורים מקצועיים בשטח
+✅ מרצים מובילים מענף הבנייה בישראל
+✅ דגש על דוגמאות מעשיות מעבודת המפקח
+✅ תעודת גמר ממכללת מרכז הבנייה הישראלי
+
+מיועד לקבלנים, קבלני שיפוצים, מפקחים, מנהלי עבודה ואנשי מקצוע בענף הבנייה.
+
+רוצה לבדוק אם הקורס מתאים לך?
+השאירו פרטים ונחזור אליכם עם כל המידע.` }
+  ], screening_q:"הקורס דורש ניסיון בענף הבנייה וידע בקריאת תוכניות. האם יש לך?", screening_opts:["ניסיון בעבודות בנייה / שיפוצים","ניסיון בתחום עיצוב / אדריכלות","אין לי ניסיון רלוונטי"], form_id:"1009899111723283", make_id:"PENDING" },
+
+  "07_innovation-kablanim_traffic": { title:"מובילי חדשנות לקבלנים (תנועה)", status:"live", adset_name:"מובילי חדשנות לקבלנים | 25.5.2026 | מרכז הבנייה הישראלי", variants:[
+    { ad_title:"קורס מובילי חדשנות לקבלנים — שבועיים שיכינו אותך לעתיד", ad_text:`ענף הבנייה משתנה. קבלנים שמשתמשים בכלים החדשניים — AI, BIM, Lean Construction — חוסכים זמן וכסף, מקבלים אישורים מהירים יותר וצומחים מהר יותר.
+
+קורס מובילי חדשנות לקבלנים של מרכז הבנייה הישראלי — שבועיים אינטנסיביים של למידה מהמובילים בענף: איך להטמיע טכנולוגיות מתקדמות באתרי הבנייה, לייעל תהליכים ולחסוך עלויות.
+
+מה לומדים בקורס:
+✅ הטמעת BIM ו-AI באתר הבנייה
+✅ Lean Construction ו-ROI על השקעה בטכנולוגיה
+✅ אתרים אוטומטיים, Big Data ו-Digital Twin
+✅ הסכמי שותפות עסקית וניהול חכם
+✅ Networking עם קבלנים מובילים בארץ
+
+📍 נתניה — מרכז הבנייה הישראלי, אצטדיון מרים
+📅 פתיחה: 25.5.2026
+
+הקורס מיועד לקבלנים, מנהלי חברות בנייה ומקבלי החלטות בענף.
+
+להשאיר פרטים ונחזור עם כל המידע על הקורס.` },
+    { ad_title:"מובילי חדשנות לקבלנים — שבועיים שיכינו אותך לעתיד", ad_text:`ענף הבנייה משתנה — וקבלנים שמסתמכים על הכלים החדשים (BIM, AI, Lean Construction) חוסכים זמן וכסף, מקבלים אישורים מהירים יותר וצומחים מהר יותר.
+
+קורס מובילי חדשנות לקבלנים של מרכז הבנייה הישראלי, בסבסוד משרד הבינוי והשיכון — 8 מפגשים, 40 שעות אקדמיות, ליווי אישי.
+
+מה נלמד:
+✅ שיטות בנייה מתקדמות וטכנולוגיות חדשות (רחפנים, חיישנים, AI)
+✅ BIM ככלי ביצוע באתר
+✅ Lean Construction וזיהוי בזבוז באתר הבנייה
+✅ מודלים של ROI על השקעה בטכנולוגיה
+✅ תוכנית הטמעה אישית לחברה שלך
+
+📍 נתניה — מרכז הבנייה הישראלי, אצטדיון מרים
+📅 פתיחה: 25.5.2026 (ימי ב' 09:00-13:00)
+💰 רק 1,000 ₪ בלבד (בסבסוד ממשלתי)
+
+מיועד לקבלנים בסיווגים 2-4, מהנדסים, מנהלי חדשנות, מנהלי פרויקטים, מנהלי עבודה ואנשי שטח.
+
+לפרטים מלאים — לחץ/י כאן 👇` }
+  ], screening_q:"—", screening_opts:[], form_id:"—", make_id:"—" },
+
+  "08_innovation-rashuyot_traffic": { title:"מובילי חדשנות לרשויות (תנועה)", status:"live", adset_name:"מובילי חדשנות לרשויות מקומיות | 24.5.2026 | מרכז הבנייה הישראלי", variants:[
+    { ad_title:"מהפכת חדשנות ברשויות המקומיות — קורס מובילי חדשנות", ad_text:`רשויות מקומיות שמובילות פרויקטים חכמים, יעילים ומתקדמים מספקות שירות טוב יותר לתושב — ומקבלות תוצאות מהירות יותר על הקרקע.
+
+קורס מובילי חדשנות ברשויות המקומיות של מרכז הבנייה הישראלי מכשיר את אנשי המקצוע ברשויות לרתום את הטכנולוגיות המתקדמות — AI, BIM, Big Data — לפרויקטי בנייה ותכנון עירוני שמשנים את פני העיר.
+
+מה לומדים בקורס:
+✅ הטמעת BIM ו-AI בפרויקטים מוניציפליים
+✅ ניהול חכם מבוסס נתונים (Data Driven)
+✅ Big Data ו-Digital Twin בעיר חכמה
+✅ ייעול פרויקטים מבוסס Lean Construction
+✅ Networking עם רשויות וגורמים מקצועיים מובילים
+
+📍 נתניה — מרכז הבנייה הישראלי, אצטדיון מרים
+📅 פתיחה: 24.5.2026
+
+הקורס מיועד למובילי חדשנות ברשויות מקומיות, מהנדסי ערים, מנהלי תכנון ופרויקטים מוניציפליים.
+
+להשאיר פרטים ונחזור עם כל המידע על הקורס.` },
+    { ad_title:"מהפכת חדשנות ברשויות המקומיות — קורס מובילי חדשנות", ad_text:`רשויות מקומיות שמובילות פרויקטים חכמים, יעילים וחסכוניים יותר מספקות שירות טוב יותר לתושב — ומקבלות תוצאות מהירות יותר על הקרקע.
+
+קורס מובילי חדשנות ברשויות המקומיות, בסבסוד משרד הבינוי והשיכון, מכשיר את אנשי המקצוע ברשויות לרתום את הטכנולוגיות המתקדמות — AI, BIM, Big Data, Lean Construction — לפרויקטי בנייה ותכנון עירוני.
+
+מה נלמד ב-8 המפגשים:
+✅ טכנולוגיות בנייה מתקדמות ומגמות חדשנות
+✅ זיהוי בזבוז בפרויקטי בנייה (Lean Construction)
+✅ טכנולוגיות מעקב — רחפנים, AR/VR, אוטומציה
+✅ סיור באתר בנייה חדשני
+✅ AI ברישוי ותכנון
+✅ BIM בניהול ביצוע
+✅ פרויקט גמר אישי המבוסס על אתגר אמיתי ברשות שלך
+
+📍 נתניה — מרכז הבנייה הישראלי, אצטדיון מרים
+📅 פתיחה: 24.5.2026 (ימי א' 09:00-13:00)
+🎓 40 שעות אקדמיות · בסבסוד מלא ממשלתי
+
+מיועד למהנדסי ערים, מנהלי אגפי הנדסה, מנהלי פרויקטים ותפקידי מפתח ברשויות מקומיות.
+
+לפרטים מלאים — לחץ/י כאן 👇` }
+  ], screening_q:"—", screening_opts:[], form_id:"—", make_id:"—" }
+};
+
+// Default variant
+Object.values(CAMPAIGNS).forEach(c => {
+  if (c.variants && c.variants[0]) { c.ad_title = c.variants[0].ad_title; c.ad_text = c.variants[0].ad_text; }
+});
+
+// ============================================================
+// USERS (demo accounts — in production use a backend)
+// ============================================================
+const USERS = {
+  "admin@bc.co.il":     { password: "demo123", name: "ליאור — מנהל מערכת",  role: "admin",     initials: "ל",
+                          permissions: ["approve","reject","comment","view_all","manage_brochures","export_meta"] },
+  "content@bc.co.il":   { password: "demo123", name: "דנה — מנהלת תוכן",     role: "content",   initials: "ד",
+                          permissions: ["upload_drive","comment","view_all"] },
+  "campaigns@bc.co.il": { password: "demo123", name: "שירה — מנהלת קמפיינים", role: "campaigns", initials: "ש",
+                          permissions: ["write_ad_copy","upload_meta_after_approval","comment","view_all"] }
+};
+const PERM_LABELS = {
+  approve: "✓ אישור תכנים", reject: "✕ דחיית תכנים", comment: "💬 הערות",
+  view_all: "👁 צפייה מלאה", manage_brochures: "📄 ניהול ברושורים", export_meta: "🚀 ייצוא למטא",
+  upload_drive: "📤 העלאה לדרייב", write_ad_copy: "✏ כתיבת טקסטים",
+  upload_meta_after_approval: "📊 העלאת קמפיין אחרי אישור"
+};
+
+// ============================================================
+// STATE (localStorage)
+// ============================================================
+const STORAGE_KEY = "drive_dashboard_state_v4";
+const SESSION_KEY = "drive_dashboard_session";
+let STATE = loadState();
+let CURRENT_USER = null;
+let activeCollege = "__all__"; // college filter
+
+function loadState() {
+  try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY)); if (s && s.approvals) return s; } catch(e) {}
+  return { role: 'admin', approvals: {}, comments: {}, notifications: [], log: [], last_sync: null };
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); }
+function nowFull() { return new Date().toLocaleString('he-IL'); }
+
+function loadSession() {
+  try { const s = JSON.parse(localStorage.getItem(SESSION_KEY)); if (s && s.email && USERS[s.email]) return s; } catch(e) {}
+  return null;
+}
+function saveSession(email) { localStorage.setItem(SESSION_KEY, JSON.stringify({ email, ts: nowFull() })); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+function hasPermission(perm) {
+  if (!CURRENT_USER) return false;
+  return CURRENT_USER.permissions.includes(perm);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+const thumb = id => `https://lh3.googleusercontent.com/d/${id}=w400`;
+const fileUrl = id => `https://drive.google.com/file/d/${id}/view`;
+const folderUrl = id => `https://drive.google.com/drive/folders/${id}`;
+function parseDate(s) { if (!s) return null; const m = s.match(/(\d+)\.(\d+)\.(\d+)/); return m ? new Date(+m[3], +m[2]-1, +m[1]) : null; }
+function daysUntil(s) { const d = parseDate(s); return d ? Math.round((d - TODAY) / 864e5) : Infinity; }
+function escapeHtml(s) { return String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+function getAllBanners(course) {
+  return [
+    ...(course.direct_banners || []).map(id => ({id, folder: 'תיקייה ראשית'})),
+    ...(course.banner_folders || []).flatMap(f => (f.banners || []).map(b => ({id: b, folder: f.title})))
+  ];
+}
+function getApproval(courseId, key) { return STATE.approvals[courseId]?.[key] || null; }
+function setApproval(courseId, key, status) {
+  if (!STATE.approvals[courseId]) STATE.approvals[courseId] = {};
+  STATE.approvals[courseId][key] = status;
+  logAction(status === 'approved' ? 'approve' : 'reject', courseId, key);
+  saveState();
+}
+function getComments(courseId, key) { return STATE.comments[`${courseId}::${key}`] || []; }
+function addComment(courseId, key, text) {
+  const k = `${courseId}::${key}`;
+  if (!STATE.comments[k]) STATE.comments[k] = [];
+  STATE.comments[k].push({ user: STATE.role, text, ts: nowFull() });
+  logAction('comment', courseId, key, text);
+  pushNotification('comment', `הערה חדשה: ${text.substring(0, 50)}${text.length>50?'…':''}`, courseId);
+  saveState();
+}
+function logAction(action, courseId, itemKey, extra) {
+  STATE.log.unshift({ action, courseId, itemKey, extra: extra || '', user: STATE.role, ts: nowFull() });
+  if (STATE.log.length > 500) STATE.log.length = 500;
+}
+function pushNotification(type, message, courseId) {
+  STATE.notifications.unshift({ id: Date.now()+Math.random(), type, message, courseId: courseId||'', ts: nowFull(), read: false });
+  if (STATE.notifications.length > 100) STATE.notifications.length = 100;
+  renderNotifBadge();
+}
+function roleLabel(r) { return r === 'admin' ? '✅ מנהל מערכת' : r === 'content' ? '👤 מנהל תוכן' : r === 'campaigns' ? '📊 מנהל קמפיינים' : r; }
+
+// ============================================================
+// APPROVAL STATS
+// ============================================================
+function approvalStats(course) {
+  const banners = getAllBanners(course);
+  const items = [
+    ...banners.map(b => `banner::${b.id}`),
+    ...(course.campaigns || []).flatMap(cid => {
+      if (!CAMPAIGNS[cid]) return [];
+      const c = CAMPAIGNS[cid];
+      const vCount = (c.variants || [{}]).length;
+      const adKeys = vCount > 1 ? Array.from({length: vCount}, (_,i) => `ad_text::${cid}::v${i}`) : [`ad_text::${cid}`];
+      const screenKey = c.screening_opts && c.screening_opts.length ? [`screening::${cid}`] : [];
+      return [...adKeys, ...screenKey];
+    })
+  ];
+  let approved = 0, rejected = 0, pending = 0;
+  items.forEach(k => {
+    const s = getApproval(course.id, k);
+    if (s === 'approved') approved++;
+    else if (s === 'rejected') rejected++;
+    else pending++;
+  });
+  let comments = 0;
+  Object.keys(STATE.comments).forEach(k => { if (k.startsWith(course.id + '::')) comments += STATE.comments[k].length; });
+  return { total: items.length, approved, rejected, pending, comments };
+}
+
+// ============================================================
+// COURSE CARD
+// ============================================================
+function courseCard(course, college) {
+  const banners = getAllBanners(course);
+  const stats = approvalStats(course);
+  const hasBrochure = !!course.brochure;
+  const hasSyllabus = !!course.syllabus;
+  const hasCampaign = (course.campaigns || []).length > 0;
+  const days = daysUntil(course.next_date);
+
+  // Status pill + color stripe
+  let stripeColor = 'bg-outline-variant', mainPill;
+  if (stats.total === 0) {
+    stripeColor = 'bg-status-danger';
+    mainPill = `<span class="bg-status-danger/10 text-status-danger border border-status-danger/20 text-meta-xs px-2 py-0.5 rounded-full flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">error</span>חסר תוכן</span>`;
+  } else if (stats.approved === stats.total) {
+    stripeColor = 'bg-status-success';
+    mainPill = `<span class="bg-status-success/10 text-status-success border border-status-success/20 text-meta-xs px-2 py-0.5 rounded-full flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">check_circle</span>מאושר סופית</span>`;
+  } else if (stats.rejected > 0) {
+    stripeColor = 'bg-status-danger';
+    mainPill = `<span class="bg-status-danger/10 text-status-danger border border-status-danger/20 text-meta-xs px-2 py-0.5 rounded-full flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">cancel</span>${stats.rejected} נדחו</span>`;
+  } else {
+    stripeColor = 'bg-status-warning';
+    mainPill = `<span class="bg-status-warning/10 text-status-warning border border-status-warning/20 text-meta-xs px-2 py-0.5 rounded-full flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">schedule</span>ממתין לאישור</span>`;
+  }
+  if (days <= 7 && days >= -3 && stats.total > 0 && stats.approved !== stats.total) {
+    stripeColor = 'bg-status-highlight';
+  }
+
+  // Date label
+  let dateLabel = '';
+  if (course.next_date && days !== Infinity) {
+    if (days < 0) dateLabel = `<span class="text-status-danger">עבר לפני ${-days} ימים</span>`;
+    else if (days === 0) dateLabel = `<span class="text-status-highlight font-semibold">פותח היום!</span>`;
+    else if (days <= 30) dateLabel = `<span class="text-status-highlight">בעוד ${days} ימים</span>`;
+  }
+
+  // Indicators
+  const ind = (label, ok, extra) => `
+    <div class="flex flex-col gap-1">
+      <span class="text-meta-xs text-text-muted">${label}</span>
+      <div class="flex items-center gap-1 ${ok ? 'text-status-success' : 'text-status-danger'}">
+        <span class="material-symbols-outlined text-[14px]">${ok ? 'check_circle' : 'cancel'}</span>
+        <span class="text-meta">${extra || (ok ? 'מלא' : 'חסר')}</span>
+      </div>
+    </div>`;
+
+  // Progress
+  let pct = 0;
+  if (stats.total > 0) pct = Math.round((stats.approved / stats.total) * 100);
+  const barColor = pct === 100 ? 'bg-status-success' : stats.rejected > 0 ? 'bg-status-danger' : 'bg-status-warning';
+
+  // CTA
+  const cta = stats.total === 0
+    ? `<button class="flex-1 bg-surface-bright text-text-muted text-body-sm py-2 rounded cursor-not-allowed flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">warning</span>אין תוכן</button>`
+    : stats.pending > 0
+    ? `<button class="flex-1 bg-primary-container text-on-primary-container text-body-sm font-semibold py-2 rounded hover:opacity-90 transition-opacity flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">rate_review</span>סקירה לאישור</button>`
+    : `<button class="flex-1 bg-status-success/20 text-status-success border border-status-success/30 text-body-sm font-semibold py-2 rounded hover:bg-status-success/30 transition-colors flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">visibility</span>צפה בעמוד קורס</button>`;
+
+  // dataset for filters
+  const ds = `data-name="${course.name}" data-has-campaign="${hasCampaign}" data-has-banners="${banners.length>0}" data-has-brochure="${hasBrochure}" data-upcoming="${days >= -3 && days <= 30}" data-pending="${stats.pending > 0}" data-approved="${stats.total > 0 && stats.approved === stats.total}" data-comments="${stats.comments > 0}" data-missing="${stats.total === 0}"`;
+
+  return `
+  <article class="course-card bg-surface-container border border-outline-variant rounded-lg p-card-padding flex flex-col gap-4 hover:border-primary-container hover:-translate-y-px transition-all duration-150 shadow-[0_1px_0_rgba(0,0,0,0.2)] relative overflow-hidden cursor-pointer" ${ds} onclick="openDrawer('${course.id}','${escapeHtml(college)}')">
+    <div class="absolute top-0 right-0 w-1 h-full ${stripeColor}"></div>
+    <div class="pr-2">
+      <div class="flex justify-between items-start mb-2 gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="bg-surface-bright border border-outline-variant/50 text-text-muted text-meta-xs px-2 py-0.5 rounded">${college}</span>
+          ${mainPill}
+        </div>
+        ${stats.comments > 0 ? `<span class="text-status-highlight flex items-center gap-1 text-meta-xs"><span class="material-symbols-outlined text-[14px]">comment</span>${stats.comments}</span>` : ''}
+      </div>
+      <h3 class="text-headline-sm text-text-primary mb-2 line-clamp-2">${course.name}</h3>
+      <div class="flex flex-wrap items-center gap-3 text-text-muted text-meta mb-3">
+        ${course.next_date ? `<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">event</span><span>${course.next_date}</span></div>` : '<div class="text-text-muted/60">אין מועד בגאנט</div>'}
+        ${course.next_location ? `<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span><span>${course.next_location}</span></div>` : ''}
+        ${dateLabel}
+      </div>
+      <div class="grid grid-cols-4 gap-2 mb-3 bg-surface rounded p-2 border border-surface-bright">
+        ${ind('ברושור', hasBrochure)}
+        ${ind('באנרים', banners.length>0, banners.length>0 ? `${banners.length} פריטים` : 'חסר')}
+        ${ind('סילבוס', hasSyllabus)}
+        ${ind('קמפיין', hasCampaign, hasCampaign ? `${course.campaigns.length} קמפיינים` : 'אין')}
+      </div>
+      ${stats.total > 0 ? `
+      <div class="mb-3">
+        <div class="flex justify-between text-meta-xs mb-1">
+          <span class="text-text-muted">התקדמות אישורים</span>
+          <span class="text-text-primary font-semibold">${pct}% (${stats.approved}/${stats.total})</span>
+        </div>
+        <div class="h-1.5 w-full bg-surface-bright rounded-full overflow-hidden flex">
+          <div class="${barColor} h-full" style="width:${pct}%"></div>
+        </div>
+      </div>` : ''}
+      <div class="flex gap-2 mt-auto" onclick="event.stopPropagation()">
+        ${cta}
+        <a href="${folderUrl(course.folder_id)}" target="_blank" class="px-3 py-2 border border-outline-variant rounded text-text-primary hover:bg-surface-bright transition-colors flex items-center justify-center" title="פתח בדרייב">
+          <span class="material-symbols-outlined text-[18px]">folder_open</span>
+        </a>
+      </div>
+    </div>
+  </article>`;
+}
+
+// ============================================================
+// MAIN RENDER
+// ============================================================
+function renderCollegeChips() {
+  const wrap = document.getElementById('college-chips');
+  if (!wrap) return;
+  const all = Object.values(DATA).reduce((sum, c) => sum + c.courses.length, 0);
+  const chips = [{ key: '__all__', label: 'כל המכללות', icon: 'apps', count: all }];
+  for (const [name, college] of Object.entries(DATA)) {
+    chips.push({ key: name, label: name, icon: 'school', count: college.courses.length });
+  }
+  wrap.innerHTML = chips.map(c => `
+    <button data-college="${c.key === '__all__' ? '__all__' : escapeHtml(c.key)}" class="college-chip ${activeCollege === c.key ? 'active' : ''} flex items-center gap-2 px-3 py-1.5 rounded-full border border-outline-variant bg-surface-container text-body-sm text-text-primary hover:border-primary-container transition-colors">
+      <span class="material-symbols-outlined text-[16px]">${c.icon}</span>
+      <span>${c.label}</span>
+      <span class="bg-surface-bright text-text-muted text-meta-xs px-2 py-0.5 rounded-full">${c.count}</span>
+    </button>
+  `).join('');
+  wrap.querySelectorAll('.college-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCollege = btn.dataset.college;
+      renderCollegeChips();
+      applyFilters();
+    });
+  });
+}
+
+function render() {
+  const app = document.getElementById('app');
+  let html = '';
+  for (const [collegeName, college] of Object.entries(DATA)) {
+    const totals = college.courses.reduce((acc, c) => {
+      const s = approvalStats(c);
+      acc.pending += s.pending; acc.approved += s.approved; acc.total += s.total;
+      return acc;
+    }, { pending: 0, approved: 0, total: 0 });
+    const collegePct = totals.total > 0 ? Math.round((totals.approved/totals.total)*100) : 0;
+    html += `
+    <section class="college mb-6" data-college="${escapeHtml(collegeName)}">
+      <div class="flex flex-wrap items-center gap-3 mb-4 p-3 bg-surface-container-low rounded-lg border border-outline-variant">
+        <span class="material-symbols-outlined text-primary-container">school</span>
+        <h2 class="text-headline-md text-text-primary">${collegeName}</h2>
+        <span class="bg-surface-container text-text-muted px-2 py-1 rounded text-meta">${college.courses.length} קורסים</span>
+        <span class="text-meta text-text-muted">·</span>
+        <span class="text-meta text-text-primary"><span class="text-status-success font-semibold">${totals.approved}</span>/${totals.total} מאושר</span>
+        ${totals.pending > 0 ? `<span class="text-meta text-status-warning">· ${totals.pending} ממתין</span>` : ''}
+        <div class="flex-1 max-w-xs h-1.5 bg-surface-bright rounded-full overflow-hidden">
+          <div class="h-full bg-status-success" style="width:${collegePct}%"></div>
+        </div>
+        <a href="${folderUrl(college.folder_id)}" target="_blank" class="mr-auto text-primary text-meta hover:underline flex items-center gap-1">פתח בדרייב<span class="material-symbols-outlined text-[14px]">open_in_new</span></a>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-gutter">
+        ${college.courses.map(c => courseCard(c, collegeName)).join('')}
+      </div>
+    </section>`;
+  }
+  app.innerHTML = html;
+  renderCollegeChips();
+  updateFilterCounts();
+  applyFilters();
+}
+
+function updateFilterCounts() {
+  const counts = { all: 0, pending: 0, approved: 0, comments: 0, missing: 0, upcoming: 0 };
+  for (const college of Object.values(DATA)) {
+    for (const c of college.courses) {
+      counts.all++;
+      const s = approvalStats(c);
+      if (s.pending > 0) counts.pending++;
+      if (s.total > 0 && s.approved === s.total) counts.approved++;
+      if (s.comments > 0) counts.comments++;
+      if (s.total === 0) counts.missing++;
+      const d = daysUntil(c.next_date);
+      if (d >= -3 && d <= 30) counts.upcoming++;
+    }
+  }
+  document.querySelectorAll('#filter-nav .filter-btn').forEach(b => {
+    const k = b.dataset.filter;
+    const el = b.querySelector('.filter-count');
+    if (el && counts[k] !== undefined) el.textContent = counts[k];
+  });
+}
+
+// ============================================================
+// DRAWER
+// ============================================================
+let currentCourse = null;
+let currentTab = 'banners';
+let currentCollege = '';
+const variantState = {};
+
+function findCourse(id) {
+  for (const college of Object.values(DATA)) {
+    const c = college.courses.find(c => c.id === id);
+    if (c) return c;
+  }
+  return null;
+}
+
+function openDrawer(courseId, college) {
+  const course = findCourse(courseId);
+  if (!course) return;
+  currentCourse = course;
+  currentCollege = college;
+  currentTab = 'banners';
+  document.getElementById('drawer-title').textContent = course.name;
+  document.getElementById('drawer-folder-link').href = folderUrl(course.folder_id);
+  const sub = document.getElementById('drawer-subtitle');
+  const days = daysUntil(course.next_date);
+  let dateExtra = '';
+  if (course.next_date && days !== Infinity) {
+    if (days < 0) dateExtra = ` · עבר לפני ${-days} ימים`;
+    else if (days <= 30) dateExtra = ` · בעוד ${days} ימים`;
+  }
+  sub.innerHTML = `
+    <span class="bg-surface-container border border-outline-variant px-2 py-0.5 rounded text-text-primary">${escapeHtml(college)}</span>
+    ${course.next_date ? `<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">event</span>${course.next_date}${dateExtra}</span>` : ''}
+    ${course.next_location ? `<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">location_on</span>${course.next_location}</span>` : ''}
+  `;
+  renderDrawerTabs();
+  renderDrawerBody();
+  renderDrawerFooter();
+  document.getElementById('drawer-overlay').classList.remove('hidden-state');
+}
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.add('hidden-state');
+  render();
+}
+
+function renderDrawerTabs() {
+  const banners = getAllBanners(currentCourse);
+  const camps = (currentCourse.campaigns || []).filter(cid => CAMPAIGNS[cid]);
+  const filesTab = filesForCourse(currentCourse);
+  const tabs = [
+    { id: 'banners', label: 'באנרים', icon: 'image', count: banners.length },
+    { id: 'ad_texts', label: 'טקסטי מודעה', icon: 'description', count: camps.length },
+    { id: 'screening', label: 'שאלות סינון', icon: 'quiz', count: camps.filter(c => CAMPAIGNS[c].screening_opts.length).length },
+    { id: 'files', label: 'קבצים בדרייב', icon: 'folder', count: filesTab.length, warn: filesTab.filter(f => !f.exists).length }
+  ];
+  document.getElementById('drawer-tabs').innerHTML = tabs.map(t => `
+    <button onclick="switchTab('${t.id}')" class="${currentTab===t.id?'text-primary border-b-2 border-primary font-semibold':'text-text-muted hover:text-text-primary border-b-2 border-transparent'} py-3 flex items-center gap-2 text-body-md transition-colors whitespace-nowrap">
+      <span class="material-symbols-outlined text-[18px]">${t.icon}</span>
+      ${t.label}
+      <span class="bg-surface-variant text-text-primary text-meta-xs px-1.5 py-0.5 rounded-full">${t.count}</span>
+      ${t.warn ? `<span class="bg-status-warning/20 text-status-warning text-meta-xs px-1.5 py-0.5 rounded-full">${t.warn} חסר</span>` : ''}
+    </button>
+  `).join('');
+}
+function switchTab(t) { currentTab = t; renderDrawerTabs(); renderDrawerBody(); renderDrawerFooter(); }
+
+function renderDrawerBody() {
+  const body = document.getElementById('drawer-body');
+  if (currentTab === 'banners') body.innerHTML = renderBannersTab();
+  else if (currentTab === 'ad_texts') body.innerHTML = renderAdTextsTab();
+  else if (currentTab === 'screening') body.innerHTML = renderScreeningTab();
+  else if (currentTab === 'files') body.innerHTML = renderFilesTab();
+}
+
+function renderDrawerFooter() {
+  const stats = approvalStats(currentCourse);
+  const pa = stats.total > 0 ? (stats.approved/stats.total)*100 : 0;
+  const pr = stats.total > 0 ? (stats.rejected/stats.total)*100 : 0;
+  const pp = stats.total > 0 ? (stats.pending/stats.total)*100 : 0;
+  document.getElementById('dr-bar-approved').style.width = pa + '%';
+  document.getElementById('dr-bar-rejected').style.width = pr + '%';
+  document.getElementById('dr-bar-pending').style.width = pp + '%';
+  document.getElementById('dr-bar-text').textContent = `${stats.approved}/${stats.total}`;
+  const btn = document.getElementById('btn-export-meta');
+  const ready = stats.total > 0 && stats.approved === stats.total;
+  btn.disabled = !ready;
+  const hint = document.getElementById('drawer-footer-hint');
+  if (ready) hint.innerHTML = `<span class="text-status-success flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">check_circle</span>הכל מאושר — מוכן לייצוא</span>`;
+  else if (stats.total === 0) hint.textContent = 'אין תכנים לאישור עדיין';
+  else hint.innerHTML = `<span class="text-status-warning">⚠ ${stats.pending} פריטים ממתינים${stats.rejected ? `, ${stats.rejected} נדחו` : ''} — לא ניתן לייצא</span>`;
+}
+
+// ============================================================
+// APPROVAL ACTIONS (per item)
+// ============================================================
+function renderApprovalActions(itemKey, courseId) {
+  const status = getApproval(courseId, itemKey);
+  const comments = getComments(courseId, itemKey);
+  const safeId = itemKey.replace(/[^a-z0-9]/gi,'_');
+  return `
+    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-outline-variant">
+      <button class="role-admin-only flex items-center gap-1 px-3 py-1.5 rounded text-body-sm font-semibold border transition-colors ${status==='approved' ? 'bg-status-success text-on-primary border-status-success' : 'bg-status-success/10 text-status-success border-status-success/30 hover:bg-status-success/20'}" onclick="event.stopPropagation();toggleApproval('${courseId}','${itemKey}','approved')">
+        <span class="material-symbols-outlined text-[16px]">${status==='approved'?'check_circle':'check'}</span>אשר
+      </button>
+      <button class="role-admin-only flex items-center gap-1 px-3 py-1.5 rounded text-body-sm font-semibold border transition-colors ${status==='rejected' ? 'bg-status-danger text-on-primary border-status-danger' : 'bg-status-danger/10 text-status-danger border-status-danger/30 hover:bg-status-danger/20'}" onclick="event.stopPropagation();toggleApproval('${courseId}','${itemKey}','rejected')">
+        <span class="material-symbols-outlined text-[16px]">${status==='rejected'?'cancel':'close'}</span>דחה
+      </button>
+      <button class="flex items-center gap-1 px-3 py-1.5 rounded text-body-sm border bg-surface-container border-outline-variant text-text-primary hover:border-primary-container transition-colors" onclick="event.stopPropagation();toggleCommentInput('${safeId}')">
+        <span class="material-symbols-outlined text-[16px]">comment</span>הערה
+      </button>
+      ${status ? `<span class="text-meta px-2 py-1 rounded ${status==='approved'?'bg-status-success/20 text-status-success':'bg-status-danger/20 text-status-danger'}">${status==='approved'?'מאושר':'נדחה'}</span>` : ''}
+      <span class="mr-auto text-meta-xs text-text-muted">${comments.length ? `${comments.length} הערות` : ''}</span>
+    </div>
+    <div id="ci-${safeId}" class="hidden-state mt-3">
+      <div class="flex gap-2">
+        <textarea id="ct-${safeId}" placeholder="הוסף הערה או בקשת תיקון…" class="flex-1 bg-surface border border-outline-variant rounded p-2 text-body-sm text-text-primary focus:outline-none focus:border-primary-container resize-y min-h-[60px]"></textarea>
+        <button onclick="event.stopPropagation();submitComment('${courseId}','${itemKey}','${safeId}')" class="px-4 py-2 bg-primary-container text-on-primary-container rounded text-body-sm font-semibold self-end hover:opacity-90">שלח</button>
+      </div>
+    </div>
+    ${comments.length ? `
+    <div class="mt-3 space-y-2">
+      ${comments.map(c => `
+        <div class="bg-surface border-r-[3px] border-primary-container rounded p-2 text-body-sm">
+          <div class="flex gap-2 text-meta-xs text-text-muted mb-1">
+            <strong class="text-text-primary">${roleLabel(c.user)}</strong>
+            <span>·</span><span>${c.ts}</span>
+          </div>
+          <div class="text-text-primary">${escapeHtml(c.text)}</div>
+        </div>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function renderBannersTab() {
+  const banners = getAllBanners(currentCourse);
+  if (!banners.length) {
+    return `<div class="bg-surface-container border border-outline-variant rounded-lg p-8 text-center">
+      <span class="material-symbols-outlined text-[48px] text-text-muted">image_not_supported</span>
+      <p class="text-text-muted mt-2">אין באנרים בתיקייה. מנהל התוכן צריך להעלות לדרייב.</p>
+    </div>`;
+  }
+  return banners.map((b, i) => {
+    const key = `banner::${b.id}`;
+    const status = getApproval(currentCourse.id, key);
+    const borderClass = status === 'approved' ? 'border-status-success/40 bg-status-success/5' : status === 'rejected' ? 'border-status-danger/40 bg-status-danger/5' : 'border-outline-variant';
+    return `
+    <div class="bg-surface-container border ${borderClass} rounded-lg p-4 mb-3">
+      <div class="flex items-start gap-3 mb-3">
+        <div class="flex-shrink-0">
+          <img src="${thumb(b.id)}" onclick="showImg('${b.id}')" class="w-32 h-32 rounded border border-outline-variant object-cover cursor-zoom-in hover:scale-105 transition-transform" onerror="this.style.display='none'" alt="" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-headline-sm text-text-primary">באנר #${i+1}</span>
+            <span class="text-meta text-text-muted">·</span>
+            <span class="text-meta text-text-muted">${b.folder}</span>
+          </div>
+          <a href="${fileUrl(b.id)}" target="_blank" class="text-primary text-meta hover:underline flex items-center gap-1 mb-2"><span class="material-symbols-outlined text-[14px]">open_in_new</span>פתח בדרייב</a>
+        </div>
+      </div>
+      ${renderApprovalActions(key, currentCourse.id)}
+    </div>`;
+  }).join('');
+}
+
+function renderAdTextsTab() {
+  const camps = (currentCourse.campaigns || []).filter(cid => CAMPAIGNS[cid]);
+  if (!camps.length) return `<div class="bg-surface-container border border-outline-variant rounded-lg p-8 text-center">
+    <span class="material-symbols-outlined text-[48px] text-text-muted">description</span>
+    <p class="text-text-muted mt-2">אין קמפיינים פעילים — מנהל הקמפיינים צריך להוסיף.</p>
+  </div>`;
+
+  return camps.map(cid => {
+    const c = CAMPAIGNS[cid];
+    const variants = c.variants || [{ ad_title: c.ad_title, ad_text: c.ad_text }];
+    const vIdx = variantState[cid] || 0;
+    const variant = variants[vIdx] || variants[0];
+    const key = variants.length > 1 ? `ad_text::${cid}::v${vIdx}` : `ad_text::${cid}`;
+    const status = getApproval(currentCourse.id, key);
+    const expandedKey = `expand_${cid}_${vIdx}`;
+    const isExpanded = variantState[expandedKey];
+    const borderClass = status === 'approved' ? 'border-status-success/40 bg-status-success/5' : status === 'rejected' ? 'border-status-danger/40 bg-status-danger/5' : 'border-outline-variant';
+
+    const variantPicker = variants.length > 1 ? `
+      <div class="flex gap-2 bg-surface p-1 rounded-lg border border-outline-variant">
+        ${variants.map((v, i) => {
+          const vStatus = getApproval(currentCourse.id, `ad_text::${cid}::v${i}`);
+          const isActive = i === vIdx;
+          return `<button onclick="event.stopPropagation();switchVariant('${cid}',${i})" class="${isActive ? 'bg-primary-container text-on-primary-container font-bold shadow-sm' : 'text-text-muted hover:bg-surface-variant'} text-meta px-3 py-1 rounded flex items-center gap-1 transition-colors">
+            גרסה ${i+1}
+            ${vStatus === 'approved' ? '<span class="material-symbols-outlined text-[14px] text-status-success">check</span>' : ''}
+            ${vStatus === 'rejected' ? '<span class="material-symbols-outlined text-[14px] text-status-danger">close</span>' : ''}
+          </button>`;
+        }).join('')}
+      </div>` : '';
+
+    return `
+    <div class="bg-surface-container border ${borderClass} rounded-lg p-card-padding mb-4">
+      <!-- Header -->
+      <div class="flex justify-between items-start border-b border-outline-variant pb-3 mb-4 gap-3 flex-wrap">
+        <div>
+          <h3 class="text-headline-sm text-text-primary mb-1">${escapeHtml(c.title)}</h3>
+          <div class="flex gap-2 flex-wrap">
+            <span class="${c.status==='live'?'bg-status-success/20 text-status-success border-status-success/30':'bg-status-warning/20 text-status-warning border-status-warning/30'} border text-meta px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span class="material-symbols-outlined text-[12px]">${c.status==='live'?'check_circle':'pause'}</span>${c.status==='live'?'פעיל':'מושהה'}
+            </span>
+            ${variants.length > 1 ? `<span class="bg-surface-variant text-text-primary border border-outline-variant text-meta px-2 py-0.5 rounded-full">${variants.length} גרסאות מודעה</span>` : ''}
+          </div>
+        </div>
+        ${variantPicker}
+      </div>
+      <!-- Ad Set name -->
+      ${c.adset_name ? `<div class="flex items-center gap-1 text-meta text-text-muted mb-3"><span class="material-symbols-outlined text-[14px]">campaign</span>Ad Set: <span class="text-text-primary">${escapeHtml(c.adset_name)}</span></div>` : ''}
+      <!-- Title -->
+      <div class="mb-4">
+        <div class="text-meta text-text-muted mb-2 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">push_pin</span>כותרת המודעה (Title)
+        </div>
+        <div class="bg-surface border border-outline-variant rounded p-3 text-body-md text-text-primary font-bold">${escapeHtml(variant.ad_title || 'טרם הוזנה כותרת')}</div>
+      </div>
+      <!-- Body -->
+      <div class="mb-4">
+        <div class="flex justify-between items-end mb-2">
+          <div class="text-meta text-text-muted flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">edit_note</span>טקסט המודעה (Body)
+          </div>
+          <span class="text-meta-xs text-text-muted">${variant.ad_text ? variant.ad_text.length : 0} תווים</span>
+        </div>
+        <div class="bg-surface border border-outline-variant rounded p-4 relative">
+          <div class="ai-text-body text-body-md text-text-primary ${!isExpanded && variant.ad_text && variant.ad_text.length > 300 ? 'collapsed' : ''}">${escapeHtml(variant.ad_text || 'טרם הוזן טקסט מודעה')}</div>
+        </div>
+        ${variant.ad_text && variant.ad_text.length > 300 ? `
+          <button onclick="event.stopPropagation();toggleExpand('${cid}',${vIdx})" class="text-primary hover:underline text-meta mt-2 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">${isExpanded?'expand_less':'expand_more'}</span>${isExpanded?'צמצם':'הצג טקסט מלא'}
+          </button>` : ''}
+      </div>
+      <!-- Meta info -->
+      <div class="flex flex-wrap gap-4 bg-surface-container-low p-3 rounded border border-outline-variant text-meta">
+        <div class="flex flex-col"><span class="text-meta-xs text-text-muted">Form ID</span><span class="text-text-primary font-mono">${c.form_id}</span></div>
+        <div class="w-px bg-outline-variant"></div>
+        <div class="flex flex-col"><span class="text-meta-xs text-text-muted">Make Scenario</span><span class="text-text-primary font-mono">${c.make_id}</span></div>
+        ${c.warn ? `<div class="w-full mt-2 bg-status-warning/10 border border-status-warning/30 text-status-warning rounded px-3 py-2 flex items-start gap-2"><span class="material-symbols-outlined text-[16px]">warning</span><span>${escapeHtml(c.warn)}</span></div>` : ''}
+      </div>
+      ${renderApprovalActions(key, currentCourse.id)}
+    </div>`;
+  }).join('');
+}
+
+function renderScreeningTab() {
+  const camps = (currentCourse.campaigns || []).filter(cid => CAMPAIGNS[cid] && CAMPAIGNS[cid].screening_opts.length);
+  if (!camps.length) return `<div class="bg-surface-container border border-outline-variant rounded-lg p-8 text-center">
+    <span class="material-symbols-outlined text-[48px] text-text-muted">quiz</span>
+    <p class="text-text-muted mt-2">אין שאלות סינון מוגדרות לקורס הזה.</p>
+  </div>`;
+  return camps.map(cid => {
+    const c = CAMPAIGNS[cid];
+    const key = `screening::${cid}`;
+    const status = getApproval(currentCourse.id, key);
+    const borderClass = status === 'approved' ? 'border-status-success/40 bg-status-success/5' : status === 'rejected' ? 'border-status-danger/40 bg-status-danger/5' : 'border-outline-variant';
+    return `
+    <div class="bg-surface-container border ${borderClass} rounded-lg p-card-padding mb-4">
+      <h3 class="text-headline-sm text-text-primary mb-3">${escapeHtml(c.title)}</h3>
+      <div class="bg-surface border border-outline-variant rounded p-3 mb-3">
+        <div class="text-meta text-text-muted mb-2 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">help</span>השאלה</div>
+        <div class="text-body-md text-text-primary font-semibold">${escapeHtml(c.screening_q)}</div>
+      </div>
+      <div class="bg-surface border border-outline-variant rounded p-3">
+        <div class="text-meta text-text-muted mb-2 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">list</span>אופציות (${c.screening_opts.length})</div>
+        <ul class="space-y-1">
+          ${c.screening_opts.map((o,i) => `<li class="flex items-start gap-2 text-body-md"><span class="text-text-muted">${i+1}.</span><span class="text-text-primary">${escapeHtml(o)}</span></li>`).join('')}
+        </ul>
+      </div>
+      ${renderApprovalActions(key, currentCourse.id)}
+    </div>`;
+  }).join('');
+}
+
+function filesForCourse(course) {
+  return [
+    { name: 'תיקייה ראשית', icon: 'folder', exists: !!course.folder_id, url: course.folder_id ? folderUrl(course.folder_id) : null },
+    { name: 'תיקיית באנרים', icon: 'image', exists: (course.banner_folders||[]).length > 0 || (course.direct_banners||[]).length > 0, url: (course.banner_folders||[]).length ? folderUrl(course.banner_folders[0].id) : null },
+    { name: 'סילבוס (PDF)', icon: 'description', exists: !!course.syllabus, url: course.syllabus ? fileUrl(course.syllabus.id) : null },
+    { name: 'ברושור (PDF)', icon: 'picture_as_pdf', exists: !!course.brochure, url: course.brochure ? fileUrl(course.brochure.id) : null },
+    { name: 'אקסל קמפיינים (Meta)', icon: 'table_chart', exists: false, url: null, suggested: `${course.name} - Meta Upload.xlsx` },
+    { name: 'סיכום קורס', icon: 'auto_awesome', exists: false, url: null, suggested: `${course.name} - Marketing Summary.docx`, auto: true }
+  ];
+}
+
+function renderFilesTab() {
+  const files = filesForCourse(currentCourse);
+  return `
+    <div class="text-body-sm text-text-muted mb-4">מבנה הקבצים הנדרש לפי הפלואו הראשי. <span class="text-status-warning font-semibold">⚠ הצהוב — חסר ויש ליצור בדרייב.</span></div>
+    ${files.map(f => `
+      <div class="bg-surface-container border border-outline-variant rounded-lg p-3 mb-2 flex items-center gap-3">
+        <span class="material-symbols-outlined text-[20px] ${f.exists ? 'text-status-success' : 'text-status-warning'}">${f.exists ? 'check_circle' : 'warning'}</span>
+        <span class="material-symbols-outlined text-[18px] text-text-muted">${f.icon}</span>
+        <div class="flex-1">
+          <div class="text-body-md text-text-primary">${f.name}${f.auto ? ' <span class="bg-primary-container/20 text-primary text-meta-xs px-1.5 py-0.5 rounded ml-1">אוטומטי</span>' : ''}</div>
+          ${!f.exists && f.suggested ? `<div class="text-meta-xs text-text-muted mt-1">שם מוצע: <code class="font-mono">${escapeHtml(f.suggested)}</code></div>` : ''}
+        </div>
+        ${f.exists && f.url ? `<a href="${f.url}" target="_blank" class="text-primary text-meta px-3 py-1 border border-outline-variant rounded hover:bg-surface-variant transition-colors">פתח</a>` : `<span class="text-status-warning text-meta-xs px-2 py-0.5 bg-status-warning/10 border border-status-warning/30 rounded">חסר</span>`}
+      </div>`).join('')}
+  `;
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function toggleApproval(courseId, itemKey, status) {
+  if (STATE.role !== 'admin') { alert('רק מנהל מערכת יכול לאשר/לדחות תכנים'); return; }
+  const cur = getApproval(courseId, itemKey);
+  setApproval(courseId, itemKey, cur === status ? null : status);
+  pushNotification(status === 'approved' ? 'approve' : 'reject',
+    `${status === 'approved' ? 'אושר' : 'נדחה'}: ${findCourse(courseId).name} — ${itemKey.split('::')[0]}`, courseId);
+  renderDrawerBody();
+  renderDrawerFooter();
+  renderNotifList();
+  renderLogList();
+}
+function toggleCommentInput(safeId) { document.getElementById('ci-' + safeId).classList.toggle('hidden-state'); }
+function submitComment(courseId, itemKey, safeId) {
+  const ta = document.getElementById('ct-' + safeId);
+  const text = ta.value.trim();
+  if (!text) return;
+  addComment(courseId, itemKey, text);
+  ta.value = '';
+  renderDrawerBody();
+  renderDrawerFooter();
+  renderNotifList();
+  renderLogList();
+}
+function switchVariant(cid, idx) { variantState[cid] = idx; renderDrawerBody(); }
+function toggleExpand(cid, v) { variantState[`expand_${cid}_${v}`] = !variantState[`expand_${cid}_${v}`]; renderDrawerBody(); }
+function showImg(id) {
+  document.getElementById('img-modal-src').src = `https://lh3.googleusercontent.com/d/${id}=w1600`;
+  document.getElementById('img-modal').classList.remove('hidden-state');
+}
+
+// ============================================================
+// NOTIFICATIONS + LOG
+// ============================================================
+function typeLabel(t) { return { upload:'📤 העלאה', approve:'✓ אישור', reject:'✕ דחייה', comment:'💬 הערה', campaign:'🚀 קמפיין' }[t] || t; }
+function typeColor(t) { return { upload:'text-primary', approve:'text-status-success', reject:'text-status-danger', comment:'text-status-highlight', campaign:'text-status-warning' }[t] || 'text-text-muted'; }
+
+function renderNotifBadge() {
+  const unread = STATE.notifications.filter(n => !n.read).length;
+  const dot = document.getElementById('notif-count');
+  dot.textContent = unread;
+  if (unread > 0) dot.classList.remove('hidden-state'); else dot.classList.add('hidden-state');
+}
+function renderNotifList() {
+  const list = document.getElementById('notif-list');
+  if (!STATE.notifications.length) {
+    list.innerHTML = '<div class="text-center text-text-muted py-8 text-body-sm">אין התראות</div>';
+    return;
+  }
+  list.innerHTML = STATE.notifications.map(n => `
+    <div onclick="markNotifRead('${n.id}')" class="bg-surface border ${n.read?'border-outline-variant':'border-r-[3px] border-primary-container'} rounded-lg p-3 cursor-pointer text-body-sm hover:bg-surface-container-high transition-colors">
+      <div class="flex items-center gap-2 text-meta-xs text-text-muted mb-1">
+        <span class="${typeColor(n.type)} font-semibold">${typeLabel(n.type)}</span>
+        <span class="mr-auto">${n.ts}</span>
+      </div>
+      <div class="text-text-primary">${escapeHtml(n.message)}</div>
+    </div>
+  `).join('');
+}
+function markNotifRead(id) {
+  const n = STATE.notifications.find(x => String(x.id) === String(id));
+  if (n) { n.read = true; saveState(); renderNotifBadge(); renderNotifList(); }
+}
+function markAllRead() {
+  STATE.notifications.forEach(n => n.read = true);
+  saveState(); renderNotifBadge(); renderNotifList();
+}
+
+function renderLogList() {
+  const list = document.getElementById('log-list');
+  if (!STATE.log.length) {
+    list.innerHTML = '<div class="text-center text-text-muted py-8 text-body-sm">אין פעולות בלוג</div>';
+    return;
+  }
+  list.innerHTML = STATE.log.map(l => {
+    const course = findCourse(l.courseId);
+    return `
+    <div class="bg-surface border border-outline-variant rounded-lg p-3 text-body-sm">
+      <div class="flex items-center gap-2 text-meta-xs text-text-muted mb-1">
+        <strong class="text-text-primary">${roleLabel(l.user)}</strong>
+        <span class="${typeColor(l.action)}">${typeLabel(l.action)}</span>
+        <span class="mr-auto">${l.ts}</span>
+      </div>
+      <div class="text-text-primary">${course ? course.name : l.courseId}</div>
+      <div class="text-meta-xs text-text-muted font-mono mt-1">${l.itemKey}</div>
+      ${l.extra ? `<div class="text-meta-xs text-text-muted mt-1">"${escapeHtml(l.extra)}"</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// DEMO ACTIONS
+// ============================================================
+function simulateUpload(type) {
+  STATE.role = 'content'; applyRole();
+  const courses = Object.values(DATA).flatMap(c => c.courses);
+  const c = courses[Math.floor(Math.random() * courses.length)];
+  pushNotification('upload', `${type === 'banner' ? 'באנר חדש' : 'סילבוס חדש'} עלה לדרייב: ${c.name}`, c.id);
+  saveState(); renderNotifList();
+}
+function simulateCampaignLive() {
+  STATE.role = 'campaigns'; applyRole();
+  const ks = Object.keys(CAMPAIGNS);
+  const c = CAMPAIGNS[ks[Math.floor(Math.random() * ks.length)]];
+  pushNotification('campaign', `קמפיין עלה לאוויר במטא: ${c.title}`, '');
+  saveState(); renderNotifList();
+}
+function resetState() {
+  if (!confirm('לאפס את כל הנתונים (אישורים, הערות, התראות, לוג)?')) return;
+  STATE = { role: 'admin', approvals: {}, comments: {}, notifications: [], log: [] };
+  saveState(); applyRole(); render(); renderNotifBadge(); renderNotifList(); renderLogList();
+}
+function exportApprovedToMeta() {
+  if (STATE.role !== 'admin') { alert('פעולה זו דורשת הרשאות מנהל מערכת'); return; }
+  const stats = approvalStats(currentCourse);
+  if (stats.approved !== stats.total || stats.total === 0) {
+    alert(`לא ניתן לייצא — ${stats.pending} פריטים ממתינים${stats.rejected ? `, ${stats.rejected} נדחו` : ''}`);
+    return;
+  }
+  pushNotification('campaign', `מוכן לייצוא להעלאה למטא: ${currentCourse.name}`, currentCourse.id);
+  logAction('export', currentCourse.id, 'meta_upload');
+  saveState();
+  alert(`✓ ${currentCourse.name} מוכן לייצוא Meta!\n\nכל הבאנרים, הטקסטים ושאלות הסינון אושרו.\nבמערכת מלאה — כאן ייווצר קובץ אקסל להעלאה.`);
+  renderNotifList(); renderLogList();
+}
+
+// ============================================================
+// AUTH (login / logout)
+// ============================================================
+function quickLogin(email, pw) {
+  document.getElementById('login-email').value = email;
+  document.getElementById('login-password').value = pw;
+  document.getElementById('login-form').requestSubmit();
+}
+function showLoginError(msg) {
+  const box = document.getElementById('login-error');
+  document.getElementById('login-error-text').textContent = msg;
+  box.classList.remove('hidden-state');
+}
+function doLogin(email, password) {
+  const u = USERS[email];
+  if (!u) { showLoginError('אימייל לא קיים במערכת'); return false; }
+  if (u.password !== password) { showLoginError('סיסמה שגויה'); return false; }
+  saveSession(email);
+  CURRENT_USER = { email, ...u };
+  STATE.role = u.role;
+  saveState();
+  document.getElementById('login-screen').classList.add('hidden-state');
+  logAction('login', '', 'session');
+  pushNotification('upload', `${u.name} התחבר/ה למערכת`, '');
+  saveState();
+  applyUser();
+  render();
+  renderNotifList();
+  renderLogList();
+  return true;
+}
+function logout() {
+  if (CURRENT_USER) logAction('logout', '', 'session');
+  saveState();
+  clearSession();
+  CURRENT_USER = null;
+  document.getElementById('user-menu').classList.add('hidden-state');
+  document.getElementById('login-screen').classList.remove('hidden-state');
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').classList.add('hidden-state');
+}
+function toggleUserMenu() { document.getElementById('user-menu').classList.toggle('hidden-state'); }
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('user-menu');
+  const btn = document.getElementById('btn-user');
+  if (menu && !menu.classList.contains('hidden-state') && !menu.contains(e.target) && !btn.contains(e.target)) {
+    menu.classList.add('hidden-state');
+  }
+});
+
+function applyUser() {
+  if (!CURRENT_USER) return;
+  document.body.dataset.role = CURRENT_USER.role;
+  document.getElementById('user-avatar').textContent = CURRENT_USER.initials;
+  document.getElementById('user-name').textContent = CURRENT_USER.name;
+  document.getElementById('user-role').textContent = roleLabel(CURRENT_USER.role);
+  document.getElementById('user-email').textContent = CURRENT_USER.email;
+  document.getElementById('user-perms').innerHTML = CURRENT_USER.permissions.map(p => `<div>${PERM_LABELS[p] || p}</div>`).join('');
+  document.getElementById('role-info-text').textContent = roleLabel(CURRENT_USER.role);
+}
+
+// ============================================================
+// REFRESH DRIVE (simulated scan)
+// ============================================================
+async function refreshDrive() {
+  const icon = document.getElementById('refresh-icon');
+  icon.classList.add('spinning');
+  icon.textContent = 'sync';
+  await new Promise(r => setTimeout(r, 1400));
+  // Count current state from DATA
+  const courses = Object.values(DATA).flatMap(c => c.courses);
+  const totalBanners = courses.reduce((sum,c) => sum + getAllBanners(c).length, 0);
+  const totalSyllabi = courses.filter(c => c.syllabus).length;
+  const totalBrochures = courses.filter(c => c.brochure).length;
+  STATE.last_sync = nowFull();
+  saveState();
+  icon.classList.remove('spinning');
+  icon.textContent = 'cloud_done';
+  setTimeout(() => { icon.textContent = 'cloud_sync'; }, 1500);
+  pushNotification('upload', `✓ סנכרון Drive הושלם · ${courses.length} קורסים · ${totalBanners} באנרים · ${totalSyllabi} סילבוסים · ${totalBrochures} ברושורים`, '');
+  logAction('refresh', '', 'drive_sync', `${courses.length} courses, ${totalBanners} banners`);
+  saveState();
+  updateLastSyncDisplay();
+  renderNotifList();
+  renderLogList();
+}
+function updateLastSyncDisplay() {
+  const el = document.getElementById('last-sync');
+  if (el && STATE.last_sync) el.textContent = `סנכרון אחרון: ${STATE.last_sync}`;
+}
+
+// ============================================================
+// ROLE & UI (legacy applyRole kept for compatibility)
+// ============================================================
+function applyRole() {
+  document.body.dataset.role = STATE.role;
+  if (CURRENT_USER) applyUser();
+  const el = document.getElementById('role-info-text');
+  if (el) el.textContent = roleLabel(STATE.role);
+}
+
+function togglePanel(name) {
+  document.querySelectorAll('.side-panel').forEach(p => {
+    if (p.id === `panel-${name}`) {
+      const shown = p.style.transform === 'translateX(0%)' || p.style.transform === 'translateX(0px)' || p.style.transform === '';
+      p.style.transform = shown ? 'translateX(-100%)' : 'translateX(0%)';
+    } else {
+      p.style.transform = 'translateX(-100%)';
+    }
+  });
+}
+
+// ============================================================
+// FILTERS
+// ============================================================
+function applyFilters() {
+  const search = (document.getElementById('search').value || '').toLowerCase();
+  const filter = document.querySelector('#filter-nav .filter-btn.bg-primary-container')?.dataset.filter || 'all';
+  document.querySelectorAll('.course-card').forEach(card => {
+    const name = (card.dataset.name || '').toLowerCase();
+    const matchSearch = !search || name.includes(search);
+    let matchFilter = true;
+    if (filter === 'pending') matchFilter = card.dataset.pending === 'true';
+    if (filter === 'approved') matchFilter = card.dataset.approved === 'true';
+    if (filter === 'comments') matchFilter = card.dataset.comments === 'true';
+    if (filter === 'missing') matchFilter = card.dataset.missing === 'true';
+    if (filter === 'upcoming') matchFilter = card.dataset.upcoming === 'true';
+    card.classList.toggle('hidden-state', !(matchSearch && matchFilter));
+  });
+  // Apply college filter at the section level
+  document.querySelectorAll('.college').forEach(c => {
+    const collegeName = c.dataset.college;
+    const collegeMatch = activeCollege === '__all__' || activeCollege === collegeName;
+    const v = c.querySelectorAll('.course-card:not(.hidden-state)').length;
+    c.classList.toggle('hidden-state', !collegeMatch || v === 0);
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  // Bind login form first (always available)
+  document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const pw = document.getElementById('login-password').value;
+    doLogin(email, pw);
+  });
+
+  // Check for existing session
+  const session = loadSession();
+  if (session && USERS[session.email]) {
+    CURRENT_USER = { email: session.email, ...USERS[session.email] };
+    STATE.role = CURRENT_USER.role;
+    saveState();
+    applyUser();
+  } else {
+    document.getElementById('login-screen').classList.remove('hidden-state');
+  }
+
+  render();
+  renderNotifBadge();
+  renderNotifList();
+  renderLogList();
+  updateLastSyncDisplay();
+
+  if (!STATE.notifications.length && !STATE.log.length) {
+    pushNotification('upload', 'ברוך הבא! לחץ "סנכרן Drive" לעדכון אחרון', '');
+    saveState(); renderNotifList(); renderNotifBadge();
+  }
+
+  document.getElementById('search').addEventListener('input', applyFilters);
+
+  document.querySelectorAll('#filter-nav .filter-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#filter-nav .filter-btn').forEach(x => {
+        x.classList.remove('bg-primary-container','text-on-primary-container','font-semibold');
+        x.classList.add('text-on-surface-variant');
+      });
+      b.classList.remove('text-on-surface-variant');
+      b.classList.add('bg-primary-container','text-on-primary-container','font-semibold');
+      applyFilters();
+    });
+  });
+
+  document.getElementById('btn-notif').addEventListener('click', () => togglePanel('notif'));
+  document.getElementById('btn-log').addEventListener('click', () => togglePanel('log'));
+}
+init();
+</script>
+</body>
+</html>
